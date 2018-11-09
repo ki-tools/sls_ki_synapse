@@ -1,0 +1,19 @@
+{
+    "description": "This file contains variables used during the serverless deploy process.",
+    "production": {
+        "AWS_PROFILE": "dev",
+        "AWS_REGION": "us-west-2"
+    },
+    "staging": {
+        "AWS_PROFILE": "dev",
+        "AWS_REGION": "us-west-2"
+    },
+    "dev": {
+        "AWS_PROFILE": "dev",
+        "AWS_REGION": "us-west-2"
+    },
+    "test": {
+        "AWS_PROFILE": "dev",
+        "AWS_REGION": "us-west-2"
+    }
+}

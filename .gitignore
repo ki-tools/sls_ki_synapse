@@ -17,9 +17,9 @@ var/
 *.egg
 *.pyc
 
-.serverless
-.venv
-.vscode
-private.*
+/.serverless
+/.venv
+/.vscode
+/private.*
 node_modules
 jspm_packages
