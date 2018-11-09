@@ -1,0 +1,38 @@
+service: sls_ki_synapse
+
+plugins:
+  - serverless-python-requirements
+provider:
+  name: aws
+  runtime: python3.6
+  stage: ${opt:stage, 'dev'}
+  profile: ${file(./private.sls.deploy.json):${self:provider.stage}.AWS_PROFILE}
+  region: ${file(./private.sls.deploy.json):${self:provider.stage}.AWS_REGION}
+  environment:
+    SERVICE_NAME: "${self:service}"
+    SERVICE_STAGE: "${self:provider.stage}"
+    
+functions:
+  hello:
+    handler: handlers/handler.graphql
+    events:
+      - http:
+          path: /
+          method: POST
+
+custom:
+  pythonRequirements:
+    slim: true
+    noDeploy:
+      - pytest
+
+package:
+  exclude:
+    - private.*
+    - .venv/**
+    - node_modules/**
+    - __pycache__/**
+    - .pytest_cache/**
+    - requirements-dev.txt
+    - templates
+    - tests
