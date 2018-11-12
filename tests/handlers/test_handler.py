@@ -3,25 +3,50 @@ from handlers import handler
 from synapseclient import EntityViewSchema, Schema, Column, Table, Row, RowSet
 import time
 from data.rally.types import Rally
+from data.rally.queries import RallyQuery
 
 
-def test_query_rally(rally_project, rally_setup):
+def test_handler(mocker):
+    q = """
+        query GetRally($rallyAdminProjectId: String!, $rallyNumber: Int!) {
+            rally(rallyAdminProjectId: $rallyAdminProjectId, rallyNumber: $rallyNumber) {
+                synId
+            }
+        }
+    """
+    v = {
+        'rallyAdminProjectId': '1',
+        'rallyNumber': 9
+    }
+
+    mock = mocker.patch.object(RallyQuery, 'resolve_rally')
+    mock.return_value = Rally()
+
+    resp = handler.graphql({'query': q, 'variables': v}, None)
+    assert not resp.get('errors', None)
+
+
+def test_query_rally(rally_setup, rally_project):
     rally = Rally.from_project(rally_project)
 
-    q = '''
-        query {
-            rally(rallyAdminProjectId: "%s", rallyNumber: %s) {
+    q = """
+        query GetRally($rallyAdminProjectId: String!, $rallyNumber: Int!) {
+            rally(rallyAdminProjectId: $rallyAdminProjectId, rallyNumber: $rallyNumber) {
                 synId
                 number
                 title
             }
         }
-    ''' % (rally_setup['rally_admin_project'].id, rally.number)
+    """
+    v = {
+        'rallyAdminProjectId': rally_setup['rally_admin_project'].id,
+        'rallyNumber': rally.number
+    }
 
-    resp = handler.graphql(q, None)
-    assert not resp.errors
-    assert resp.data['rally'] != None
-    assert resp.data['rally']['synId'] == rally_project.id
+    resp = handler.graphql({'query': q, 'variables': v}, None)
+    assert not resp.get('errors', None)
+    assert resp['data']['rally'] != None
+    assert resp['data']['rally']['synId'] == rally.synId
 
 
 def test_create_rally(rally_setup, rally_number, syn_client, syn_test_helper_session):
@@ -31,14 +56,14 @@ def test_create_rally(rally_setup, rally_number, syn_client, syn_test_helper_ses
     wikiTaskTemplateId = rally_setup['master_task_wiki_template'].id
     wikiRallyTemplateId = rally_setup['master_rally_wiki_template'].id
     allFilesSchemaId = rally_setup['all_files_schema'].id
-    defaultRallyTeamMembers = rally_setup['rally_config']['defaultRallyTeamMembersStr']
-    rallyAdminTeamPermissions = rally_setup['rally_config']['rallyAdminTeamPermissionsStr']
-    sprintFolders = rally_setup['rally_config']['sprintFoldersStr']
-    posts = rally_setup['rally_config']['postsStr']
+    defaultRallyTeamMembers = rally_setup['rally_config']['defaultRallyTeamMembers']
+    rallyAdminTeamPermissions = rally_setup['rally_config']['rallyAdminTeamPermissions']
+    sprintFolders = rally_setup['rally_config']['sprintFolders']
+    posts = rally_setup['rally_config']['posts']
 
     q = '''
-       mutation createNewRally {
-        createRally(rallyNumber: %s, consortium: "%s", rallyAdminProjectId: "%s", wikiTaskTemplateId: "%s", wikiRallyTemplateId: "%s", allFilesSchemaId: "%s", defaultRallyTeamMembers: [%s], rallyAdminTeamPermissions: [%s], sprintFolders: [%s], posts: [%s]) {
+       mutation CreateNewRally($rallyNumber: Int!, $consortium: String!, $rallyAdminProjectId: String!, $wikiTaskTemplateId: String!, $wikiRallyTemplateId: String!, $allFilesSchemaId: String!, $defaultRallyTeamMembers: [Int]!, $rallyAdminTeamPermissions: [String]!, $sprintFolders: [String]!, $posts: [PostDataInput]!) {
+        createRally(rallyNumber: $rallyNumber, consortium: $consortium, rallyAdminProjectId: $rallyAdminProjectId, wikiTaskTemplateId: $wikiTaskTemplateId, wikiRallyTemplateId: $wikiRallyTemplateId, allFilesSchemaId: $allFilesSchemaId, defaultRallyTeamMembers: $defaultRallyTeamMembers, rallyAdminTeamPermissions: $rallyAdminTeamPermissions, sprintFolders: $sprintFolders, posts: $posts) {
             rally {
                 synId
                 number
@@ -47,13 +72,26 @@ def test_create_rally(rally_setup, rally_number, syn_client, syn_test_helper_ses
             ok
         }
     }
-    ''' % (rallyNumber, consortium, rallyAdminProjectId, wikiTaskTemplateId, wikiRallyTemplateId, allFilesSchemaId, defaultRallyTeamMembers, rallyAdminTeamPermissions, sprintFolders, posts)
+    '''
+    v = {
+        'rallyNumber': rallyNumber,
+        'consortium': consortium,
+        'rallyAdminProjectId': rallyAdminProjectId,
+        'wikiTaskTemplateId': wikiTaskTemplateId,
+        'wikiRallyTemplateId': wikiRallyTemplateId,
+        'allFilesSchemaId': allFilesSchemaId,
+        'defaultRallyTeamMembers': defaultRallyTeamMembers,
+        'rallyAdminTeamPermissions': rallyAdminTeamPermissions,
+        'sprintFolders': sprintFolders,
+        'posts': posts
+    }
 
-    resp = handler.graphql(q, None)
-    assert not resp.errors
+    resp = handler.graphql({'query': q, 'variables': v}, None)
+    assert not resp.get('errors', None)
 
     # Get the project and team so they can be deleted.
-    rally_project = syn_client.get(resp.data['createRally']['rally']['synId'])
+    rally_project = syn_client.get(
+        resp['data']['createRally']['rally']['synId'])
     syn_test_helper_session.dispose_of(rally_project)
 
     rally = Rally.from_project(rally_project)

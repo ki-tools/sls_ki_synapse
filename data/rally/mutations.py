@@ -26,7 +26,8 @@ class CreateRally(graphene.Mutation):
         sprintFolders = graphene.List(graphene.String)
         posts = graphene.List(PostDataInput)
 
-    def mutate(self, info,
+    def mutate(self,
+               info,
                rallyNumber,
                consortium,
                rallyAdminProjectId,

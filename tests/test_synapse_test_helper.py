@@ -72,7 +72,9 @@ def test_dispose(syn_client, syn_test_helper, temp_file):
                 syn_client.getWiki(syn_obj)
             else:
                 syn_client.get(syn_obj, downloadFile=False)
-        assert "Not Found" in str(ex.value)
+
+        err_str = str(ex.value)
+        assert "Not Found" in err_str or "cannot be found" in err_str or "is in trash can" in err_str or "does not exist" in err_str
 
     try:
         os.remove(temp_file)
@@ -138,3 +140,14 @@ def test_create_wiki(syn_test_helper):
 
     syn_test_helper.dispose()
     assert len(syn_test_helper._trash) == 0
+
+
+def test__empty_syn_trash(syn_client, syn_test_helper):
+    syn_test_helper.create_project()
+    syn_test_helper.dispose()
+    trash_info = syn_client.restGET('/trashcan/view')
+    assert trash_info['totalNumberOfResults'] > 0
+
+    result = syn_test_helper._empty_syn_trash()
+    trash_info = syn_client.restGET('/trashcan/view')
+    assert trash_info['totalNumberOfResults'] == 0

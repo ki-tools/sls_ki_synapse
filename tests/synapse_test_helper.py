@@ -58,8 +58,6 @@ class SynapseTestHelper:
             else:
                 others.append(obj)
 
-        failed_to_deletes = []
-
         for syn_obj in wikis:
             try:
                 Synapse.client().delete(syn_obj)
@@ -96,11 +94,8 @@ class SynapseTestHelper:
             self._trash.remove(syn_obj)
 
         for obj in others:
-            print('WARNING: Non-Synapse object found: {0}'.format(obj))
+            print('WARNING: Non-Supported object found: {0}'.format(obj))
             self._trash.remove(obj)
-
-        for syn_obj in failed_to_deletes:
-            print('WARNING: Failed to delete: {0}'.format(syn_obj))
 
     def create_project(self, **kwargs):
         """
@@ -155,3 +150,19 @@ class SynapseTestHelper:
         wiki = Synapse.client().store(Wiki(**kwargs))
         self.dispose_of(wiki)
         return wiki
+
+    def _empty_syn_trash(self):
+        """
+        Deletes all items in the Synapse Trash.
+        """
+        # This does not work for some reason...
+        # return Synapse.client().restPUT('/trashcan/purge')
+
+        # Page through the trash and delete each entity.
+        trash_info = Synapse.client().restGET('/trashcan/view')
+
+        while trash_info['totalNumberOfResults'] > 0:
+            for result in trash_info['results']:
+                Synapse.client().restPUT(
+                    '/trashcan/purge/{0}'.format(result['entityId']))
+            trash_info = Synapse.client().restGET('/trashcan/view')

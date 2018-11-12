@@ -4,7 +4,7 @@ import os
 import json
 from tests.synapse_test_helper import SynapseTestHelper
 from core.synapse import Synapse
-from synapseclient import EntityViewSchema, Schema, Column, Table, Row, RowSet
+from synapseclient import EntityViewSchema, EntityViewType, Schema, Column, Table, Row, RowSet
 import time
 import kirallymanager.manager as krm
 
@@ -73,6 +73,7 @@ def rally_setup(syn_client, syn_test_helper_session, temp_file_session):
         name=syn_test_helper_session.uniq_name(prefix='Rally View '),
         parent=master_project,
         scopes=[master_project],
+        includeEntityTypes=[EntityViewType.PROJECT],
         columns=[Column(name='rally', columnType='INTEGER')])
     )
 
@@ -112,21 +113,23 @@ def rally_setup(syn_client, syn_test_helper_session, temp_file_session):
             'defaultRallyTeamMembers': [],
             'defaultRallyTeamMembersStr': '',
             'rallyAdminTeamPermissions': ["DOWNLOAD", "CHANGE_PERMISSIONS", "CHANGE_SETTINGS", "MODERATE", "READ", "UPDATE", "DELETE", "CREATE"],
-            'rallyAdminTeamPermissionsStr': '"DOWNLOAD", "CHANGE_PERMISSIONS", "CHANGE_SETTINGS", "MODERATE", "READ", "UPDATE", "DELETE", "CREATE"',
             'sprintFolders': ["Data", "Research Questions", "Results", "Sprint kickoff", "Report out", "Timeline"],
-            'sprintFoldersStr': '"Data", "Research Questions", "Results", "Sprint kickoff", "Report out", "Timeline"',
-            'posts': [{"title": "test", "messageMarkdown": "Use this post for a daily check in."}],
-            'postsStr': '{title: "test", messageMarkdown: "Use this post for a daily check in."}',
+            'posts': [{"title": "test", "messageMarkdown": "Use this post for a daily check in."}]
         }
     }
     return result
 
 
 @pytest.fixture(scope='session')
-def rally_project(syn_test_helper_session, rally_setup, rally_number_session):
+def rally_project(syn_client, syn_test_helper_session, rally_setup, rally_number_session):
     project = krm.createRally(
         Synapse.client(), rally_number_session, rally_setup['rally_config'])
     syn_test_helper_session.dispose_of(project)
+
+    # Get the team that was created for the Rally so it gets deleted.
+    rally_team = syn_client.getTeam(project.rallyTeam[0])
+    syn_test_helper_session.dispose_of(rally_team)
+
     return project
 
 
