@@ -1,6 +1,7 @@
 import os
 import boto3
 import logging
+import json
 
 
 class ParamStore:
@@ -39,7 +40,8 @@ class ParamStore:
         result = None
 
         try:
-            get_response = client.get_parameter(Name=ssm_key, WithDecryption=True)
+            get_response = client.get_parameter(
+                Name=ssm_key, WithDecryption=True)
             result = get_response.get('Parameter').get('Value')
         except client.exceptions.ParameterNotFound:
             logging.exception('SSM Parameter Not Found: {}'.format(ssm_key))
@@ -47,20 +49,23 @@ class ParamStore:
         return result
 
     @classmethod
-    def _set_ssm_parameter(cls, key, value, type='string'):
+    def _set_ssm_parameter(cls, key, value, type='SecureString'):
         """
         Sets an SSM key/value.
         """
         client = boto3.client('ssm')
         ssm_key = cls._build_ssm_key(key)
-        return client.put_parameter(Name=ssm_key, Value=value, Type=type)
+        return client.put_parameter(Name=ssm_key, Value=value, Type=type, Overwrite=True)
 
     @classmethod
     def _build_ssm_key(cls, key):
         """
         Builds a SSM key in the format for service_name/service_stage/key.
         """
-        return '{0}/{1}/{2}'.format(os.environ.get('SERVICE_NAME'), os.environ.get('SERVICE_STAGE'), key)
+        service_name = os.environ.get('SERVICE_NAME')
+        service_stage = os.environ.get('SERVICE_STAGE')
+
+        return '/{0}/{1}/{2}'.format(service_name, service_stage, key)
 
     """
     ===============================================================================================

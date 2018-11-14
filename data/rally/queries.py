@@ -5,10 +5,16 @@ import kirallymanager.manager as krm
 
 
 class RallyQuery(graphene.ObjectType):
+    """
+    Defines all the Rally queries.
+    """
     rally = graphene.Field(
         Rally, rallyAdminProjectId=graphene.String(), rallyNumber=graphene.Int())
 
     def resolve_rally(self, info, rallyAdminProjectId, rallyNumber):
+        """
+        Gets a Rally via the ki-rally-manager.
+        """
         project = krm.getRally(
             Synapse.client(), rallyAdminProjectId, rallyNumber)
         if project:

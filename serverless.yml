@@ -1,23 +1,31 @@
-service: sls_ki_synapse
+service: 
+  name: sls-ki-synapse
 
 plugins:
   - serverless-python-requirements
+
 provider:
   name: aws
   runtime: python3.6
   stage: ${opt:stage, 'dev'}
   profile: ${file(./private.sls.deploy.json):${self:provider.stage}.AWS_PROFILE}
   region: ${file(./private.sls.deploy.json):${self:provider.stage}.AWS_REGION}
+  timeout: 900
   environment:
     SERVICE_NAME: "${self:service}"
     SERVICE_STAGE: "${self:provider.stage}"
-    
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action:
+        - "ssm:GetParameter"
+      Resource: { "Fn::Join" : ["", ["arn:aws:ssm:${self:provider.region}:", { "Ref" : "AWS::AccountId" }, ":parameter/${self:service}/${self:provider.stage}/*" ] ]  }
+
 functions:
-  hello:
+  graphql:
     handler: handlers/handler.graphql
     events:
       - http:
-          path: /
+          path: /graphql
           method: POST
 
 custom:
@@ -36,3 +44,4 @@ package:
     - requirements-dev.txt
     - templates
     - tests
+    - scripts

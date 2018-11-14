@@ -70,4 +70,4 @@ def test__set_ssm_parameter(key, value):
 def test__build_ssm_key(monkeypatch):
     monkeypatch.setenv('SERVICE_NAME', 'a')
     monkeypatch.setenv('SERVICE_STAGE', 'b')
-    assert ParamStore._build_ssm_key('c') == 'a/b/c'
+    assert ParamStore._build_ssm_key('c') == '/a/b/c'

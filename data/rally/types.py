@@ -2,6 +2,9 @@ import graphene
 
 
 class Rally(graphene.ObjectType):
+    """
+    Defines the Rally type.
+    """
     synId = graphene.String()
     number = graphene.Int()
     title = graphene.String()
@@ -10,7 +13,7 @@ class Rally(graphene.ObjectType):
     @staticmethod
     def from_project(project):
         """
-        Converts a project to a Rally.
+        Converts a Project to a Rally.
         """
         return Rally(
             synId=project.id,

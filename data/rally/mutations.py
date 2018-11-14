@@ -5,11 +5,17 @@ import kirallymanager.manager as krm
 
 
 class PostDataInput(graphene.InputObjectType):
+    """
+    Input class for 'posts' data in CreateRally.
+    """
     title = graphene.String(required=True)
     messageMarkdown = graphene.String()
 
 
 class CreateRally(graphene.Mutation):
+    """
+    Mutation for create a Rally.
+    """
     ok = graphene.Boolean()
     rally = graphene.Field(lambda: Rally)
 
@@ -65,4 +71,7 @@ class CreateRally(graphene.Mutation):
 
 
 class RallyMutation(graphene.ObjectType):
+    """
+    Defines all the Rally mutations.
+    """
     create_rally = CreateRally.Field()

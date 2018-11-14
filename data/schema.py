@@ -1,14 +1,22 @@
 import graphene
-from .rally.types import Rally
 from .rally.queries import RallyQuery
 from .rally.mutations import RallyMutation
 
-
-class Query(RallyQuery, graphene.ObjectType):
+class Query(
+        RallyQuery,
+        graphene.ObjectType):
+    """
+    Root Query Class.
+    """
     pass
 
 
-class Mutation(RallyMutation, graphene.ObjectType):
+class Mutation(
+        RallyMutation,
+        graphene.ObjectType):
+    """
+    Root Mutation Class.
+    """
     pass
 
 

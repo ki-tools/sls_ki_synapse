@@ -1,3 +1,5 @@
+import os
+import tempfile
 from core.param_store import ParamStore
 import synapseclient
 
@@ -12,6 +14,10 @@ class Synapse:
         Gets a logged in instance of the synapseclient.
         """
         if not cls._synapse_client:
+            # Lambda can only write to /tmp so update the CACHE_ROOT_DIR.
+            synapseclient.cache.CACHE_ROOT_DIR = os.path.join(
+                tempfile.gettempdir(), 'synapseCache')
+
             syn_user = ParamStore.SYNAPSE_USERNAME()
             syn_pass = ParamStore.SYNAPSE_PASSWORD()
             cls._synapse_client = synapseclient.Synapse()

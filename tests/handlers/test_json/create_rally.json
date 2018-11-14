@@ -1,0 +1,18 @@
+{
+    "query": "mutation CreateNewRally($rallyNumber: Int!, $consortium: String!, $rallyAdminProjectId: String!, $wikiTaskTemplateId: String!, $wikiRallyTemplateId: String!, $allFilesSchemaId: String!, $defaultRallyTeamMembers: [Int]!, $rallyAdminTeamPermissions: [String]!, $sprintFolders: [String]!, $posts: [PostDataInput]!) {createRally(rallyNumber: $rallyNumber, consortium: $consortium, rallyAdminProjectId: $rallyAdminProjectId, wikiTaskTemplateId: $wikiTaskTemplateId, wikiRallyTemplateId: $wikiRallyTemplateId, allFilesSchemaId: $allFilesSchemaId, defaultRallyTeamMembers: $defaultRallyTeamMembers, rallyAdminTeamPermissions: $rallyAdminTeamPermissions, sprintFolders: $sprintFolders, posts: $posts) { rally { synId number title } ok } }",
+    "variables": {
+        "rallyNumber": 1,
+        "consortium": "Just a Test",
+        "rallyAdminProjectId": "syn17051406",
+        "wikiTaskTemplateId": "syn17051402",
+        "wikiRallyTemplateId": "syn17051402",
+        "allFilesSchemaId": "syn17051405",
+        "defaultRallyTeamMembers": [],
+        "rallyAdminTeamPermissions": ["DOWNLOAD", "CHANGE_PERMISSIONS", "CHANGE_SETTINGS", "MODERATE", "READ", "UPDATE", "DELETE", "CREATE"],
+        "sprintFolders": ["Data", "Research Questions", "Results", "Sprint kickoff", "Report out", "Timeline"],
+        "posts": [{
+            "title": "test",
+            "messageMarkdown": "Use this post for a daily check in."
+        }]
+    }
+}
