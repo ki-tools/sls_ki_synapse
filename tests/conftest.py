@@ -11,17 +11,23 @@ from data.rally.types import (Rally, RallySprint)
 
 
 # Load Environment variables.
-with open('private.test.env.json') as f:
-    config = json.load(f).get('test')
+test_env_file = 'private.test.env.json'
 
-    # Validate required properties are present
-    for prop in['SYNAPSE_USERNAME', 'SYNAPSE_PASSWORD']:
-        if not prop in config or not config[prop]:
-            raise Exception(
-                'Property: "{0}" is missing in private.test.env.json'.format(prop))
+if os.path.isfile(test_env_file):
+    with open('private.test.env.json') as f:
+        config = json.load(f).get('test')
 
-    for key, value in config.items():
-        os.environ[key] = value
+        # Validate required properties are present
+        for prop in['SYNAPSE_USERNAME', 'SYNAPSE_PASSWORD']:
+            if not prop in config or not config[prop]:
+                raise Exception(
+                    'Property: "{0}" is missing in private.test.env.json'.format(prop))
+
+        for key, value in config.items():
+            os.environ[key] = value
+else:
+    print('WARNING: Test environment file not found at: {0}'.format(
+        test_env_file))
 
 
 @pytest.fixture(scope='session')
