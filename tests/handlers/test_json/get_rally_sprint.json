@@ -1,0 +1,8 @@
+{
+    "query": "query GetRallySprint($rallyAdminProjectId: String!, $rallyNumber: Int!, $sprintLetter: String!) { rallySprint(rallyAdminProjectId: $rallyAdminProjectId, rallyNumber: $rallyNumber, sprintLetter: $sprintLetter) { synId } }",
+    "variables": {
+      "rallyAdminProjectId": "syn17051406",
+      "rallyNumber": 1,
+      "sprintLetter": "A"
+    }
+}

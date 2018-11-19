@@ -1,5 +1,5 @@
 synapseclient==1.9.0
-git+https://github.com/Sage-Bionetworks/ki-rally-manager.git#egg=kirallymanager
+git+https://github.com/ki-tools/ki-rally-manager.git#egg=kirallymanager
 numpy==1.15.4
 pandas==0.23.4
 jsonschema==2.6.0

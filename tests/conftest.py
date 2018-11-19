@@ -7,6 +7,8 @@ from core.synapse import Synapse
 from synapseclient import EntityViewSchema, EntityViewType, Schema, Column, Table, Row, RowSet
 import time
 import kirallymanager.manager as krm
+from data.rally.types import (Rally, RallySprint)
+
 
 # Load Environment variables.
 with open('private.test.env.json') as f:
@@ -77,8 +79,19 @@ def rally_setup(syn_client, syn_test_helper_session, temp_file_session):
         columns=[Column(name='rally', columnType='INTEGER')])
     )
 
-    task_table_schema = syn_client.store(EntityViewSchema(name=syn_test_helper_session.uniq_name(
-        prefix='Task View '), parent=master_project, scopes=[master_project]))
+    task_table_schema = syn_client.store(EntityViewSchema(
+        name=syn_test_helper_session.uniq_name(prefix='Task View '),
+        parent=master_project,
+        scopes=[master_project])
+    )
+
+    sprint_table_schema = syn_client.store(EntityViewSchema(
+        name=syn_test_helper_session.uniq_name(prefix='Sprint View '),
+        parent=master_project,
+        scopes=[master_project],
+        includeEntityTypes=[EntityViewType.PROJECT],
+        columns=[Column(name='sprintNumber', columnType='STRING')])
+    )
 
     all_files_schema = syn_client.store(EntityViewSchema(name=syn_test_helper_session.uniq_name(
         prefix='Master All Files View '), parent=master_project, scopes=[master_project]))
@@ -91,7 +104,8 @@ def rally_setup(syn_client, syn_test_helper_session, temp_file_session):
         rallyAdminTeamId=rally_admin_team.id,
         rallyTableId=rally_table_schema.id,
         wikiMasterTemplateId=master_wiki_template.id,
-        taskTableTemplateId=task_table_schema.id
+        taskTableTemplateId=task_table_schema.id,
+        sprintTableId=sprint_table_schema.id
     )
 
     result = {
@@ -117,6 +131,7 @@ def rally_setup(syn_client, syn_test_helper_session, temp_file_session):
             'posts': [{"title": "test", "messageMarkdown": "Use this post for a daily check in."}]
         }
     }
+
     return result
 
 
@@ -127,10 +142,32 @@ def rally_project(syn_client, syn_test_helper_session, rally_setup, rally_number
     syn_test_helper_session.dispose_of(project)
 
     # Get the team that was created for the Rally so it gets deleted.
-    rally_team = syn_client.getTeam(project.rallyTeam[0])
+    rally_team = syn_client.getTeam(project.annotations.rallyTeam[0])
     syn_test_helper_session.dispose_of(rally_team)
 
     return project
+
+
+@pytest.fixture(scope='session')
+def rally(rally_project):
+    return Rally.from_project(rally_project)
+
+
+@pytest.fixture(scope='session')
+def rally_sprint_project(syn_client, syn_test_helper_session, rally, rally_setup):
+    project = krm.createSprint(
+        Synapse.client(), rally.number, 'Z', rally_setup['rally_config'])
+    syn_test_helper_session.dispose_of(project)
+
+    rally_team = syn_client.getTeam(project.annotations.rallyTeam[0])
+    syn_test_helper_session.dispose_of(rally_team)
+
+    return project
+
+
+@pytest.fixture(scope='session')
+def rally_sprint(rally_sprint_project):
+    return RallySprint.from_project(rally_sprint_project)
 
 
 @pytest.fixture

@@ -8,6 +8,8 @@ Capabilities:
 
 - [Create a Rally](tests/handlers/test_json/create_rally.json)
 - [Get a Rally](tests/handlers/test_json/get_rally.json)
+- [Create a Rally Sprint](tests/handlers/test_json/create_rally_sprint.json)
+- [Get a Rally Sprint](tests/handlers/test_json/get_rally_sprint.json)
 
 ## Development Setup
 
@@ -39,5 +41,8 @@ Capabilities:
 
 - View Logs: `sls logs -f graphql --tail`
 - Test Queries:
-  - Get a Rally:  `sls invoke -f graphql -p tests/handlers/test_json/get_rally.json`
   - Create a Rally: `sls invoke -f graphql -p tests/handlers/test_json/create_rally.json`
+  - Get a Rally:  `sls invoke -f graphql -p tests/handlers/test_json/get_rally.json`
+  - Create a Rally Sprint: `sls invoke -f graphql -p tests/handlers/test_json/create_rally_sprint.json`
+  - Get a Rally Sprint:  `sls invoke -f graphql -p tests/handlers/test_json/get_rally_sprint.json`
+  
