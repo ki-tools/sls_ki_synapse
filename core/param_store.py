@@ -86,10 +86,6 @@ class ParamStore:
         return cls.get('LOG_LEVEL', default)
 
     @classmethod
-    def SQS_DISPATCH_QUEUE_URL(cls, default=None):
-        return cls.get('SQS_DISPATCH_QUEUE_URL', default)
-
-    @classmethod
     def SYNAPSE_API_KEY(cls, default=None):
         return cls.get('SYNAPSE_API_KEY', default)
 
