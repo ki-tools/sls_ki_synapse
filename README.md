@@ -1,5 +1,7 @@
 # SLS KI Synapse
 
+[![Build Status](https://travis-ci.com/pcstout/sls_ki_synapse.svg?branch=master)](https://travis-ci.com/pcstout/sls_ki_synapse)
+
 ## Overview
 
 A [Serverless](https://serverless.com/framework/docs/getting-started) application that runs on [AWS Lambda](https://aws.amazon.com/lambda) exposing a [GraphQL](https://graphql.org) interface for maintaining Rallies in [Synapse](https://www.synapse.org).
