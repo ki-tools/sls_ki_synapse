@@ -42,7 +42,9 @@ Capabilities:
 ## Authentication
 
 Authentication will be done via API Gateway with a Lambda function.
+
 Initially a simple JWT authentication mechanism will be used to secure this service. A more robust authentication system will be implemented at a later date.
+
 A secret will be stored in an environment variable along with a comma separated list of API keys.
 
 ```shell
@@ -53,8 +55,8 @@ JWT_API_KEYS=key1,key2,key3
 The process for allowing a client access to the service is as follows:
 
 1. Generate a secret key and an API key by running [gen_key.py](scripts/gen_key.py).
-   1.1 Add the keys to your `private.ssm.env.json` file.
-   1.2 Update SSM: `./scripts/set_ssm.py <service-stage>`
+   - Add the keys to your `private.ssm.env.json` file.
+   - Update SSM: `./scripts/set_ssm.py <service-stage>`
 2. Generate a JWT for the client by running [gen_jwt.py](scripts/gen_jwt.py). Use the secret and API key generated above.
 
 ## Manual Testing
