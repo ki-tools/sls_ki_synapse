@@ -63,9 +63,7 @@ def test_handler_get_rally_sprint(mocker):
     assert resp['data']['rallySprint']['synId'] == expected_syn_id
 
 
-def test_query_rally(rally_setup, rally_project):
-    rally = Rally.from_project(rally_project)
-
+def test_query_rally(rally_setup, rally):
     q = """
         query GetRally($rallyAdminProjectId: String!, $rallyNumber: Int!) {
             rally(rallyAdminProjectId: $rallyAdminProjectId, rallyNumber: $rallyNumber) {
@@ -118,18 +116,10 @@ def test_create_rally(rally_setup, rally_number, syn_client, syn_test_helper_ses
     allFilesSchemaId = rally_setup['all_files_schema'].id
     defaultRallyTeamMembers = rally_setup['rally_config']['defaultRallyTeamMembers']
     rallyAdminTeamPermissions = rally_setup['rally_config']['rallyAdminTeamPermissions']
-    sprintFolders = rally_setup['rally_config']['sprintFolders']
-    posts = rally_setup['rally_config']['posts']
-
-    # Remove the 'forumId' from the posts.
-    # This value gets added when another tests uses a fixture that creates a sprint
-    # TODO: Find a better way to handle this.
-    for post in posts:
-        post.pop('forumId', None)
 
     q = '''
-      mutation CreateNewRally($rallyNumber: Int!, $consortium: String!, $rallyAdminProjectId: String!, $wikiTaskTemplateId: String!, $wikiRallyTemplateId: String!, $allFilesSchemaId: String!, $defaultRallyTeamMembers: [Int]!, $rallyAdminTeamPermissions: [String]!, $sprintFolders: [String]!, $posts: [PostDataInput]!) {
-        createRally(rallyNumber: $rallyNumber, consortium: $consortium, rallyAdminProjectId: $rallyAdminProjectId, wikiTaskTemplateId: $wikiTaskTemplateId, wikiRallyTemplateId: $wikiRallyTemplateId, allFilesSchemaId: $allFilesSchemaId, defaultRallyTeamMembers: $defaultRallyTeamMembers, rallyAdminTeamPermissions: $rallyAdminTeamPermissions, sprintFolders: $sprintFolders, posts: $posts) {
+      mutation CreateNewRally($rallyNumber: Int!, $consortium: String!, $rallyAdminProjectId: String!, $wikiTaskTemplateId: String!, $wikiRallyTemplateId: String!, $allFilesSchemaId: String!, $defaultRallyTeamMembers: [Int]!, $rallyAdminTeamPermissions: [String]!) {
+        createRally(rallyNumber: $rallyNumber, consortium: $consortium, rallyAdminProjectId: $rallyAdminProjectId, wikiTaskTemplateId: $wikiTaskTemplateId, wikiRallyTemplateId: $wikiRallyTemplateId, allFilesSchemaId: $allFilesSchemaId, defaultRallyTeamMembers: $defaultRallyTeamMembers, rallyAdminTeamPermissions: $rallyAdminTeamPermissions) {
           rally {
             synId
             number
@@ -147,9 +137,7 @@ def test_create_rally(rally_setup, rally_number, syn_client, syn_test_helper_ses
         'wikiRallyTemplateId': wikiRallyTemplateId,
         'allFilesSchemaId': allFilesSchemaId,
         'defaultRallyTeamMembers': defaultRallyTeamMembers,
-        'rallyAdminTeamPermissions': rallyAdminTeamPermissions,
-        'sprintFolders': sprintFolders,
-        'posts': posts
+        'rallyAdminTeamPermissions': rallyAdminTeamPermissions
     }
 
     resp = do_post(q, v)

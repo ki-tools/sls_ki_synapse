@@ -37,7 +37,8 @@ Capabilities:
   - `./scripts/set_ssm.py <service-stage>` 
     - Example: `./scripts/set_ssm.py production`
 - Deploy to AWS
-  - `sls deploy`
+  - `sls deploy --stage <STAGE>`
+    - Example: - `sls deploy --stage production`
   
 ## Authentication
 

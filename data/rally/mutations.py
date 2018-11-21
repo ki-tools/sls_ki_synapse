@@ -4,14 +4,6 @@ from core.synapse import Synapse
 import kirallymanager.manager as krm
 
 
-class PostDataInput(graphene.InputObjectType):
-    """
-    Input class for 'posts' data in CreateRally.
-    """
-    title = graphene.String(required=True)
-    messageMarkdown = graphene.String()
-
-
 class CreateRally(graphene.Mutation):
     """
     Mutation for creating a Rally.
@@ -29,8 +21,6 @@ class CreateRally(graphene.Mutation):
         defaultRallyTeamMembers = graphene.List(graphene.Int)
         rallyAdminTeamPermissions = graphene.List(
             graphene.String, required=True)
-        sprintFolders = graphene.List(graphene.String)
-        posts = graphene.List(PostDataInput)
 
     def mutate(self,
                info,
@@ -41,9 +31,7 @@ class CreateRally(graphene.Mutation):
                wikiRallyTemplateId,
                allFilesSchemaId,
                defaultRallyTeamMembers,
-               rallyAdminTeamPermissions,
-               sprintFolders,
-               posts):
+               rallyAdminTeamPermissions):
 
         rally_config = {
             "consortium": consortium,
@@ -52,15 +40,8 @@ class CreateRally(graphene.Mutation):
             "wikiRallyTemplateId": wikiRallyTemplateId,
             "allFilesSchemaId": allFilesSchemaId,
             "defaultRallyTeamMembers": defaultRallyTeamMembers,
-            "rallyAdminTeamPermissions": rallyAdminTeamPermissions,
-            "sprintFolders": sprintFolders,
-            "posts": []
+            "rallyAdminTeamPermissions": rallyAdminTeamPermissions
         }
-        for post in posts:
-            rally_config['posts'].append({
-                "title": post.title,
-                "messageMarkdown": post.messageMarkdown
-            })
 
         project = krm.createRally(Synapse.client(), rallyNumber, rally_config)
 
@@ -68,6 +49,14 @@ class CreateRally(graphene.Mutation):
 
         is_ok = True
         return CreateRally(rally=new_rally, ok=is_ok)
+
+
+class PostDataInput(graphene.InputObjectType):
+    """
+    Input class for 'posts' data in CreateRallySprint.
+    """
+    title = graphene.String(required=True)
+    messageMarkdown = graphene.String()
 
 
 class CreateRallySprint(graphene.Mutation):
