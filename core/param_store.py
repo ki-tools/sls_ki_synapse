@@ -86,10 +86,6 @@ class ParamStore:
         return cls.get('LOG_LEVEL', default)
 
     @classmethod
-    def SYNAPSE_API_KEY(cls, default=None):
-        return cls.get('SYNAPSE_API_KEY', default)
-
-    @classmethod
     def SYNAPSE_USERNAME(cls, default=None):
         return cls.get('SYNAPSE_USERNAME', default)
 
