@@ -1,4 +1,4 @@
-
+#!/usr/bin/env python3
 import json
 import argparse
 import sys
@@ -6,11 +6,11 @@ import os
 import yaml
 
 script_dir = os.path.dirname(__file__)
-sys.path.append(os.path.join(script_dir, '..', 'core'))
+sys.path.append(os.path.join(script_dir, '..'))
 try:
-    from param_store import ParamStore
-except:
-    print('WARNING: Failed to load param_store')
+    from core.param_store import ParamStore
+except Exception as ex:
+    print('WARNING: Failed to load param_store: {0}'.format(ex))
 
 
 def load_json(path):

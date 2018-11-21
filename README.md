@@ -33,11 +33,31 @@ Capabilities:
 
 ## Deploying
 
-- Populate SSM with the environment variables. This only needs to be done once or when the files/values change.
-  - `python scripts/set_ssm.py <service-stage>` 
-    - Example: `python scripts/set_ssm.py production`
+- Populate SSM with the environment variables. This only needs to be done once or when the files/values change. See the [Authentication](#authentication) section for generating secrets and API keys.
+  - `./scripts/set_ssm.py <service-stage>` 
+    - Example: `./scripts/set_ssm.py production`
 - Deploy to AWS
   - `sls deploy`
+  
+## Authentication
+
+Authentication will be done using [API Gateway Lambda Authorizers](https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-use-lambda-authorizer.html).
+
+Initially a simple JWT authentication mechanism will be used to secure this service. A more robust authentication system will be implemented at a later date.
+
+A secret will be stored in an environment variable along with a comma separated list of API keys.
+
+```shell
+JWT_SECRET=my-secret-string
+JWT_API_KEYS=key1,key2,key3
+```
+
+The process for allowing a client access to the service is as follows:
+
+1. Generate a secret key and an API key by running [gen_key.py](scripts/gen_key.py).
+   - Add the keys to your `private.ssm.env.json` file.
+   - Update SSM: `./scripts/set_ssm.py <service-stage>`
+2. Generate a JWT for the client by running [gen_jwt.py](scripts/gen_jwt.py). Use the secret and API key generated above.
 
 ## Manual Testing
 
@@ -47,4 +67,4 @@ Capabilities:
   - Get a Rally:  `sls invoke -f graphql -p tests/handlers/test_json/get_rally.json`
   - Create a Rally Sprint: `sls invoke -f graphql -p tests/handlers/test_json/create_rally_sprint.json`
   - Get a Rally Sprint:  `sls invoke -f graphql -p tests/handlers/test_json/get_rally_sprint.json`
-  
+  - With curl: `curl -X POST -H 'Authorization: Bearer JWT_TOKEN_HERE' --data 'QUERY_HERE' ENDPOINT_URL_HERE`

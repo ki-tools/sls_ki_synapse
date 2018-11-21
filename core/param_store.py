@@ -86,13 +86,23 @@ class ParamStore:
         return cls.get('LOG_LEVEL', default)
 
     @classmethod
-    def SYNAPSE_API_KEY(cls, default=None):
-        return cls.get('SYNAPSE_API_KEY', default)
-
-    @classmethod
     def SYNAPSE_USERNAME(cls, default=None):
         return cls.get('SYNAPSE_USERNAME', default)
 
     @classmethod
     def SYNAPSE_PASSWORD(cls, default=None):
         return cls.get('SYNAPSE_PASSWORD', default)
+
+    @classmethod
+    def JWT_SECRET(cls, default=None):
+        """
+        Secret key used to encode JWTs.
+        """
+        return cls.get('JWT_SECRET', default)
+
+    @classmethod
+    def JWT_API_KEYS(cls, default=None):
+        """
+        String of comma separated keys that are used for API access.
+        """
+        return cls.get('JWT_API_KEYS', default)

@@ -1,5 +1,5 @@
 import pytest
-from handlers import handler
+from handlers import graphql_handler
 from synapseclient import EntityViewSchema, Schema, Column, Table, Row, RowSet
 import time
 import json as JSON
@@ -13,7 +13,7 @@ def do_post(query, variables):
     """
     event = {'query': query, 'variables': variables}
     context = None
-    return JSON.loads(handler.graphql(event, context))
+    return JSON.loads(graphql_handler.graphql(event, context))
 
 
 def test_handler_get_rally(mocker):

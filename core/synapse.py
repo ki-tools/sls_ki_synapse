@@ -1,7 +1,7 @@
 import os
 import tempfile
-from core.param_store import ParamStore
 import synapseclient
+from .param_store import ParamStore
 
 
 class Synapse:

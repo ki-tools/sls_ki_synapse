@@ -22,11 +22,14 @@ provider:
 
 functions:
   graphql:
-    handler: handlers/handler.graphql
+    handler: handlers/graphql_handler.graphql
     events:
       - http:
           path: /graphql
           method: POST
+          authorizer: auth
+  auth:
+    handler: handlers/auth_handler.authenticate
 
 custom:
   pythonRequirements:

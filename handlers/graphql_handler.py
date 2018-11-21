@@ -14,7 +14,7 @@ def graphql(event, context):
     """
     Handles the graphql event.
     """
-    logging.debug('Event Received: {}'.format(json.dumps(event)))
+    logging.debug('Event Received: graphql: {}'.format(json.dumps(event)))
 
     # Execute the GraphQL query.
     execution_results, _ = run_http_query(schema.root(), 'post', event)
@@ -32,6 +32,6 @@ def graphql(event, context):
     # JSON encode the response.
     json_response = json.dumps(response)
 
-    logging.debug('Event Response: {}'.format(json_response))
+    logging.debug('Event Response: graphql: {}'.format(json_response))
 
     return json_response
