@@ -41,7 +41,7 @@ Capabilities:
   
 ## Authentication
 
-Authentication will be done via API Gateway with a Lambda function.
+Authentication will be done using [API Gateway Lambda Authorizers](https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-use-lambda-authorizer.html).
 
 Initially a simple JWT authentication mechanism will be used to secure this service. A more robust authentication system will be implemented at a later date.
 
