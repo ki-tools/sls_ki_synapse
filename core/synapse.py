@@ -8,8 +8,13 @@ class Synapse:
 
     _synapse_client = None
 
+    ADMIN_PERMS = ['UPDATE','DELETE','CHANGE_PERMISSIONS','CHANGE_SETTINGS','CREATE','DOWNLOAD','READ','MODERATE']
+    CAN_EDIT_AND_DELETE_PERMS = ['DOWNLOAD','UPDATE','CREATE','DELETE','READ']
+    CAN_EDIT_PERMS = ['DOWNLOAD','UPDATE','CREATE','READ']
+
     @classmethod
     def client(cls):
+
         """
         Gets a logged in instance of the synapseclient.
         """

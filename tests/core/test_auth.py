@@ -1,6 +1,6 @@
 import pytest
 import jwt
-from core.auth import Auth
+from core import Auth
 
 
 def test_authenticate(monkeypatch):

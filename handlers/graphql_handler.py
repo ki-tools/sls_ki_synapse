@@ -1,6 +1,7 @@
-import os, sys
+import os
+import sys
 import json
-import core.log
+from core import log
 import logging
 from data import schema
 from graphql_server import (

@@ -1,6 +1,6 @@
 import pytest
 from handlers import auth_handler
-from core.auth import Auth
+from core import Auth
 import json
 
 

@@ -1,6 +1,6 @@
 import pytest
-from core.synapse import Synapse
-from core.param_store import ParamStore
+from core import (ParamStore, Synapse)
+
 
 def test_client():
     assert Synapse.client() != None

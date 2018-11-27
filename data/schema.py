@@ -1,8 +1,10 @@
 import graphene
-from .rally.queries import RallyQuery
-from .rally.mutations import RallyMutation
+from .syn_project import (SynProjectQuery, SynProjectMutation)
+from .rally import (RallyQuery, RallyMutation)
+
 
 class Query(
+        SynProjectQuery,
         RallyQuery,
         graphene.ObjectType):
     """
@@ -12,6 +14,7 @@ class Query(
 
 
 class Mutation(
+        SynProjectMutation,
         RallyMutation,
         graphene.ObjectType):
     """

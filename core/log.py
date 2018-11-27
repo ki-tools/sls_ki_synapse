@@ -1,5 +1,5 @@
 import logging
-from core.param_store import ParamStore
+from .param_store import ParamStore
 
 """
 Setup the logger.

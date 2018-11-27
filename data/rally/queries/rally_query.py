@@ -1,6 +1,6 @@
 import graphene
-from .types import (Rally, RallySprint)
-from core.synapse import Synapse
+from ..types import (Rally, RallySprint)
+from core import Synapse
 import kirallymanager.manager as krm
 
 

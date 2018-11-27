@@ -1,7 +1,6 @@
 import os
 import uuid
-from core.param_store import ParamStore
-from core.synapse import Synapse
+from core import Synapse
 import synapseclient
 from synapseclient import Project, Folder, File, Team, Wiki
 

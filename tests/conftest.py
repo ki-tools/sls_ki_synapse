@@ -2,12 +2,12 @@ import pytest
 import tempfile
 import os
 import json
-from tests.synapse_test_helper import SynapseTestHelper
-from core.synapse import Synapse
-from synapseclient import EntityViewSchema, EntityViewType, Schema, Column, Table, Row, RowSet
 import time
+from tests.synapse_test_helper import SynapseTestHelper
+from core import Synapse
+from synapseclient import EntityViewSchema, EntityViewType, Column
 import kirallymanager.manager as krm
-from data.rally.types import (Rally, RallySprint)
+from data.rally import (Rally, RallySprint)
 
 
 # Load Environment variables.

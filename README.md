@@ -64,6 +64,8 @@ The process for allowing a client access to the service is as follows:
 
 - View Logs: `sls logs -f graphql --tail`
 - Test Queries:
+  - Get a SynProject:  `sls invoke -f graphql -p tests/handlers/test_json/get_syn_project.json`
+  - Create a SynProject: `sls invoke -f graphql -p tests/handlers/test_json/create_syn_project.json`
   - Create a Rally: `sls invoke -f graphql -p tests/handlers/test_json/create_rally.json`
   - Get a Rally:  `sls invoke -f graphql -p tests/handlers/test_json/get_rally.json`
   - Create a Rally Sprint: `sls invoke -f graphql -p tests/handlers/test_json/create_rally_sprint.json`

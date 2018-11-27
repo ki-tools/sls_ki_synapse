@@ -1,6 +1,5 @@
-import core.log
+from core import (log, Auth)
 import logging
-from core.auth import Auth
 
 
 def generatePolicy(principalId, effect, methodArn):

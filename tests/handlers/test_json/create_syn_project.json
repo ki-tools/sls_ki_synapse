@@ -1,0 +1,16 @@
+{
+    "query": "mutation CreateSynProject($name: String!, $rallyAdminTeamId: Int!, $wiki: WikiDataInput, $folders: [String], $posts: [PostDataInput]) { createSynProject(name: $name, rallyAdminTeamId: $rallyAdminTeamId, wiki: $wiki, folders: $folders, posts: $posts) { synProject { id name } ok } }",
+    "variables": {
+        "name": "A Test SynProject",
+        "rallyAdminTeamId": 3381745,
+        "wiki": {
+            "title": "Main Wiki",
+            "markdown": "main wiki markdown"
+        },
+        "folders": ["Data", "Research Questions", "Results", "Sprint kickoff", "Report out", "Timeline"],
+        "posts": [{
+            "title": "test",
+            "messageMarkdown": "Use this post for a daily check in."
+        }]
+    }
+}
