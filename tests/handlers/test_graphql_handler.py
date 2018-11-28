@@ -68,15 +68,20 @@ def test_query_syn_project(syn_test_helper):
 
 def test_create_syn_project(syn_client, syn_test_helper):
     name = syn_test_helper.uniq_name(prefix='Syn Project ')
-    rallyAdminTeamId = syn_test_helper.create_team().id
+
+    admin_team = syn_test_helper.create_team()
+    permissions = [{"principalId": str(admin_team.id), "access": "ADMIN"}]
+
+    annotations = [{"key": "rally", "value": "1"},
+                   {"key": "sprint", "value": "A"}]
     wiki = {'title': 'Main Wiki', 'markdown': 'main wiki markdown'}
     folders = ['Folder1', 'Folder2']
     posts = [{"title": "test1", "messageMarkdown": "markdown1"},
              {"title": "test2", "messageMarkdown": "markdown2"}]
 
     q = '''
-      mutation CreateSynProject($name: String!, $rallyAdminTeamId: Int!, $wiki: WikiDataInput, $folders: [String], $posts: [PostDataInput]) {
-        createSynProject(name: $name, rallyAdminTeamId: $rallyAdminTeamId, wiki: $wiki, folders: $folders, posts: $posts) {
+      mutation CreateSynProject($name: String!, $permissions: [PermissionDataInput], $annotations: [AnnotationDataInput], $wiki: WikiDataInput, $folders: [String], $posts: [PostDataInput]) {
+        createSynProject(name: $name, permissions: $permissions, annotations: $annotations, wiki: $wiki, folders: $folders, posts: $posts) {
           synProject {
             id
             name
@@ -87,7 +92,8 @@ def test_create_syn_project(syn_client, syn_test_helper):
     '''
     v = {
         "name": name,
-        "rallyAdminTeamId": rallyAdminTeamId,
+        "permissions": permissions,
+        "annotations": annotations,
         "wiki": wiki,
         "folders": folders,
         "posts": posts
@@ -105,8 +111,17 @@ def test_create_syn_project(syn_client, syn_test_helper):
     assert project.name == name
 
     # Admin Team
-    admin_team_perms = syn_client.getPermissions(project, rallyAdminTeamId)
-    assert set(admin_team_perms) == set(Synapse.ADMIN_PERMS)
+    for permission in permissions:
+        principal_id = permission['principalId']
+        access = permission['access']
+        access_type = getattr(Synapse, '{0}_PERMS'.format(access))
+
+        perms = syn_client.getPermissions(project, principal_id)
+        assert set(perms) == set(access_type)
+
+    # Annotations
+    for annotation in annotations:
+        assert project.annotations[annotation['key']][0] == annotation['value']
 
     # Wiki
     main_wiki = syn_client.getWiki(project)
@@ -131,17 +146,18 @@ def test_update_syn_project(syn_client, syn_test_helper):
 
     id = project.id
     name = syn_test_helper.uniq_name(prefix='New Project Name ')
-    participants = []
+    permissions = []
 
     other_test_user_id = ParamStore._get_from_os('SYNAPSE_OTHER_USER_ID')
     if other_test_user_id:
-        participants.append(other_test_user_id)
+        permissions.append(
+            {"principalId": other_test_user_id, "access": "CAN_EDIT"})
     else:
         print('WARNING: SYNAPSE_OTHER_USER_ID environment variable not set.')
 
     q = '''
-      mutation UpdateSynProject($id: String!, $name: String, $participants: [Int]) {
-        updateSynProject(id: $id, name: $name, participants: $participants) {
+      mutation UpdateSynProject($id: String!, $name: String, $permissions: [PermissionDataInput]) {
+        updateSynProject(id: $id, name: $name, permissions: $permissions) {
           synProject {
             id
             name
@@ -153,7 +169,7 @@ def test_update_syn_project(syn_client, syn_test_helper):
     v = {
         "id": id,
         "name": name,
-        "participants": participants
+        "permissions": permissions
     }
 
     resp = do_post(q, v)
@@ -164,9 +180,15 @@ def test_update_syn_project(syn_client, syn_test_helper):
     # Reload the project
     project = syn_client.get(project)
     assert project.name == name
-    for user_id in participants:
-        perms = syn_client.getPermissions(project, user_id)
-        assert perms
+    
+    # Permissions
+    for permission in permissions:
+        principal_id = permission['principalId']
+        access = permission['access']
+        access_type = getattr(Synapse, '{0}_PERMS'.format(access))
+
+        perms = syn_client.getPermissions(project, principal_id)
+        assert set(perms) == set(access_type)
 
 ###################################################################################################
 # Rally

@@ -54,7 +54,7 @@ class CreateRallySprint(graphene.Mutation):
         for post in posts:
             rally_config['posts'].append({
                 "title": post.title,
-                "messageMarkdown": post.messageMarkdown
+                "messageMarkdown": post.message_markdown
             })
 
         project = krm.createSprint(

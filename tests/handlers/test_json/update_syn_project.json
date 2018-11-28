@@ -1,0 +1,11 @@
+{
+    "query": "mutation UpdateSynProject($id: String!, $name: String, $permissions: [PermissionDataInput]) { updateSynProject(id: $id, name: $name, permissions: $permissions) { synProject { id name } ok } }",
+    "variables": {
+        "id": "syn17068521",
+        "name": "An Updated SynProject",
+        "permissions": [{
+            "principalId": "3381745",
+            "access": "CAN_EDIT"
+        }]
+    }
+}

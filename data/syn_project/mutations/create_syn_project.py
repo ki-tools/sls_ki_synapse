@@ -1,6 +1,8 @@
 import graphene
 import json
 from core import Synapse
+from .annotation_data_input import AnnotationDataInput
+from .permission_data_input import PermissionDataInput
 from .post_data_input import PostDataInput
 from .wiki_data_input import WikiDataInput
 from ..types import SynProject
@@ -16,7 +18,8 @@ class CreateSynProject(graphene.Mutation):
 
     class Arguments:
         name = graphene.String(required=True)
-        rallyAdminTeamId = graphene.Int(required=True)
+        permissions = graphene.List(PermissionDataInput)
+        annotations = graphene.List(AnnotationDataInput)
         wiki = WikiDataInput()
         folders = graphene.List(graphene.String)
         posts = graphene.List(PostDataInput)
@@ -24,20 +27,36 @@ class CreateSynProject(graphene.Mutation):
     def mutate(self,
                info,
                name,
-               rallyAdminTeamId,
+               permissions,
+               annotations,
                wiki,
                folders,
                posts):
 
-        # Create the Project
-        project = Synapse.client().store(Project(name=name))
+        # Build the annotations
+        project_annotations = {}
+        if annotations:
+            for annotation in annotations:
+                project_annotations[annotation['key']] = annotation['value']
 
-        # Add the admin team
-        Synapse.client().setPermissions(
-            project,
-            rallyAdminTeamId,
-            accessType=Synapse.ADMIN_PERMS,
-            warn_if_inherits=False)
+        # Create the Project
+        project = Synapse.client().store(
+            Project(name=name, annotations=project_annotations)
+        )
+
+        # Add the permissions
+        if permissions:
+            for permission in permissions:
+                principal_id = permission['principal_id']
+                access = permission['access']
+                access_type = getattr(Synapse, '{0}_PERMS'.format(access))
+
+                Synapse.client().setPermissions(
+                    project,
+                    principal_id,
+                    accessType=access_type,
+                    warn_if_inherits=False
+                )
 
         # Add the the folders
         if folders:
@@ -49,7 +68,12 @@ class CreateSynProject(graphene.Mutation):
             forum_id = Synapse.client().restGET(
                 '/project/{0}/forum'.format(project.id)).get('id')
             for post in posts:
-                body = {**post, **{'forumId': forum_id}}
+                #body = {**post, **{'forumId': forum_id}}
+                body = {
+                    'forumId': forum_id,
+                    'title': post['title'],
+                    'messageMarkdown': post['message_markdown']
+                }
                 Synapse.client().restPOST("/thread", body=json.dumps(body))
 
         # Add the wiki
