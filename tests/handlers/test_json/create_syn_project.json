@@ -3,7 +3,7 @@
     "variables": {
         "name": "A Test SynProject",
         "permissions": [{
-            "principalId": "3381745",
+            "principalId": 3381745,
             "access": "ADMIN"
         }],
         "annotations": [{

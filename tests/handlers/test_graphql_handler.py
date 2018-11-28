@@ -143,15 +143,16 @@ def test_create_syn_project(syn_client, syn_test_helper):
 
 def test_update_syn_project(syn_client, syn_test_helper):
     project = syn_test_helper.create_project()
+    team = syn_test_helper.create_team()
 
     id = project.id
     name = syn_test_helper.uniq_name(prefix='New Project Name ')
-    permissions = []
+    permissions = [{"principalId": int(team.id), "access": "CAN_EDIT"}]
 
     other_test_user_id = ParamStore._get_from_os('SYNAPSE_OTHER_USER_ID')
     if other_test_user_id:
         permissions.append(
-            {"principalId": other_test_user_id, "access": "CAN_EDIT"})
+            {"principalId": int(other_test_user_id), "access": "CAN_EDIT"})
     else:
         print('WARNING: SYNAPSE_OTHER_USER_ID environment variable not set.')
 
@@ -180,7 +181,7 @@ def test_update_syn_project(syn_client, syn_test_helper):
     # Reload the project
     project = syn_client.get(project)
     assert project.name == name
-    
+
     # Permissions
     for permission in permissions:
         principal_id = permission['principalId']
@@ -189,6 +190,20 @@ def test_update_syn_project(syn_client, syn_test_helper):
 
         perms = syn_client.getPermissions(project, principal_id)
         assert set(perms) == set(access_type)
+
+    # Make sure permissions are removed
+    removed_perm = permissions.pop()
+
+    resp = do_post(q, v)
+    assert not resp.get('errors', None)
+
+    acl = Synapse.client()._getACL(project)
+
+    current_principal_ids = [int(r['principalId'])
+                             for r in acl['resourceAccess']]
+
+    assert int(removed_perm['principalId']) not in current_principal_ids
+
 
 ###################################################################################################
 # Rally

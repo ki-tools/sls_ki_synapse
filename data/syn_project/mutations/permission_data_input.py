@@ -16,6 +16,6 @@ class PermissionDataInput(graphene.InputObjectType):
     """
     Input class for 'permissions' data.
     """
-    principal_id = graphene.String(
+    principal_id = graphene.Int(
         required=True, description='ID of a Synapse user or team.')
     access = graphene.Field(SynapseAccessType, required=True)

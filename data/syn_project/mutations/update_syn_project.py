@@ -36,6 +36,7 @@ class UpdateSynProject(graphene.Mutation):
 
                 # Only add permissions, do not update permissions.
                 current_perms = Synapse.client().getPermissions(project, principal_id)
+                
                 if not current_perms:
                     Synapse.client().setPermissions(
                         project,
@@ -43,6 +44,21 @@ class UpdateSynProject(graphene.Mutation):
                         accessType=access_type,
                         warn_if_inherits=False
                     )
+            # Remove permissions
+            new_principal_ids = [int(p['principal_id']) for p in permissions]
+
+            acl = Synapse.client()._getACL(project)
+
+            current_principal_ids = [int(r['principalId'])
+                                     for r in acl['resourceAccess']]
+
+            for current_principal_id in current_principal_ids:
+                if current_principal_id == int(project.createdBy):
+                    continue
+                    
+                if not current_principal_id in new_principal_ids:
+                    Synapse.client().setPermissions(project, current_principal_id,
+                                                    accessType=None, warn_if_inherits=False)
 
         project = Synapse.client().store(project)
         updated_syn_project = SynProject.from_project(project)
