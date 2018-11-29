@@ -12,6 +12,4 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .auth import Auth
-from .param_store import ParamStore
-from .synapse import Synapse
+from .syn_project import SynProject

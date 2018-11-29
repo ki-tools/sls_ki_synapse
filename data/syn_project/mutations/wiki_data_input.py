@@ -12,6 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .auth import Auth
-from .param_store import ParamStore
-from .synapse import Synapse
+import graphene
+
+
+class WikiDataInput(graphene.InputObjectType):
+    """
+    Input class for 'wiki' data.
+    """
+    title = graphene.String(required=True)
+    markdown = graphene.String()

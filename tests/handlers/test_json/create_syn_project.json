@@ -1,0 +1,26 @@
+{
+    "query": "mutation CreateSynProject($name: String!, $permissions: [PermissionDataInput], $annotations: [AnnotationDataInput], $wiki: WikiDataInput, $folders: [String], $posts: [PostDataInput]) { createSynProject(name: $name, permissions: $permissions, annotations: $annotations, wiki: $wiki, folders: $folders, posts: $posts) { synProject { id name } ok } }",
+    "variables": {
+        "name": "A Test SynProject",
+        "permissions": [{
+            "principalId": 3381745,
+            "access": "ADMIN"
+        }],
+        "annotations": [{
+            "key": "rally",
+            "value": "1"
+        }, {
+            "key": "sprint",
+            "value": "A"
+        }],
+        "wiki": {
+            "title": "Main Wiki",
+            "markdown": "main wiki markdown"
+        },
+        "folders": ["Data", "Research Questions", "Results", "Sprint kickoff", "Report out", "Timeline"],
+        "posts": [{
+            "title": "test",
+            "messageMarkdown": "Use this post for a daily check in."
+        }]
+    }
+}
