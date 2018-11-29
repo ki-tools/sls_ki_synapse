@@ -15,7 +15,7 @@ def test_authenticate(monkeypatch):
     arn = 'a-test-arn'
 
     event = {
-        'authorizationToken': token,
+        'authorizationToken': 'Bearer {0}'.format(token),
         'methodArn': arn
     }
     resp = auth_handler.authenticate(event, None)

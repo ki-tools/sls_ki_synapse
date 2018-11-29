@@ -2,7 +2,7 @@ import pytest
 from handlers import graphql_handler
 from synapseclient import EntityViewSchema
 import time
-import json as JSON
+import json
 from core import (ParamStore, Synapse)
 from data.syn_project import (SynProject, SynProjectQuery)
 from data.rally import (Rally, RallySprint, RallyQuery)
@@ -12,9 +12,14 @@ def do_post(query, variables):
     """
     Executes a query against the handler.
     """
-    event = {'query': query, 'variables': variables}
+    event = {'body': json.dumps({'query': query, 'variables': variables})}
     context = None
-    return JSON.loads(graphql_handler.graphql(event, context))
+    response = graphql_handler.graphql(event, context)
+
+    # Convert the body to a dict so testing is easier.
+    response['body'] = json.loads(response['body'])
+
+    return response
 
 ###################################################################################################
 # SynProject
@@ -39,9 +44,9 @@ def test_handler_get_syn_project(mocker):
     mock = mocker.patch.object(SynProjectQuery, 'resolve_syn_project')
     mock.return_value = SynProject(id=expected_syn_id)
 
-    resp = do_post(q, v)
-    assert not resp.get('errors', None)
-    assert resp['data']['synProject']['id'] == expected_syn_id
+    body = do_post(q, v).get('body')
+    assert not body.get('errors', None)
+    assert body['data']['synProject']['id'] == expected_syn_id
 
 
 def test_query_syn_project(syn_test_helper):
@@ -59,11 +64,11 @@ def test_query_syn_project(syn_test_helper):
         'id': project.id
     }
 
-    resp = do_post(q, v)
-    assert not resp.get('errors', None)
-    assert resp['data']['synProject'] != None
-    assert resp['data']['synProject']['id'] == project.id
-    assert resp['data']['synProject']['name'] == project.name
+    body = do_post(q, v).get('body')
+    assert not body.get('errors', None)
+    assert body['data']['synProject'] != None
+    assert body['data']['synProject']['id'] == project.id
+    assert body['data']['synProject']['name'] == project.name
 
 
 def test_create_syn_project(syn_client, syn_test_helper):
@@ -99,10 +104,10 @@ def test_create_syn_project(syn_client, syn_test_helper):
         "posts": posts
     }
 
-    resp = do_post(q, v)
-    assert not resp.get('errors', None)
+    body = do_post(q, v).get('body')
+    assert not body.get('errors', None)
 
-    jsyn_project = resp['data']['createSynProject']['synProject']
+    jsyn_project = body['data']['createSynProject']['synProject']
     assert jsyn_project['name'] == name
 
     project = syn_client.get(jsyn_project['id'])
@@ -173,9 +178,9 @@ def test_update_syn_project(syn_client, syn_test_helper):
         "permissions": permissions
     }
 
-    resp = do_post(q, v)
-    assert not resp.get('errors', None)
-    jsyn_project = resp['data']['updateSynProject']['synProject']
+    body = do_post(q, v).get('body')
+    assert not body.get('errors', None)
+    jsyn_project = body['data']['updateSynProject']['synProject']
     assert jsyn_project['name'] == name
 
     # Reload the project
@@ -194,8 +199,8 @@ def test_update_syn_project(syn_client, syn_test_helper):
     # Make sure permissions are removed
     removed_perm = permissions.pop()
 
-    resp = do_post(q, v)
-    assert not resp.get('errors', None)
+    body = do_post(q, v).get('body')
+    assert not body.get('errors', None)
 
     acl = Synapse.client()._getACL(project)
 
@@ -228,9 +233,9 @@ def test_handler_get_rally(mocker):
     mock = mocker.patch.object(RallyQuery, 'resolve_rally')
     mock.return_value = Rally(synId=expected_syn_id)
 
-    resp = do_post(q, v)
-    assert not resp.get('errors', None)
-    assert resp['data']['rally']['synId'] == expected_syn_id
+    body = do_post(q, v).get('body')
+    assert not body.get('errors', None)
+    assert body['data']['rally']['synId'] == expected_syn_id
 
 
 def test_query_rally(rally_setup, rally):
@@ -248,11 +253,11 @@ def test_query_rally(rally_setup, rally):
         'rallyNumber': rally.number
     }
 
-    resp = do_post(q, v)
-    assert not resp.get('errors', None)
-    assert resp['data']['rally'] != None
-    assert resp['data']['rally']['synId'] == rally.synId
-    assert resp['data']['rally']['number'] == rally.number
+    body = do_post(q, v).get('body')
+    assert not body.get('errors', None)
+    assert body['data']['rally'] != None
+    assert body['data']['rally']['synId'] == rally.synId
+    assert body['data']['rally']['number'] == rally.number
 
 
 def test_create_rally(rally_setup, rally_number, syn_client, syn_test_helper_session):
@@ -288,12 +293,12 @@ def test_create_rally(rally_setup, rally_number, syn_client, syn_test_helper_ses
         'rallyAdminTeamPermissions': rallyAdminTeamPermissions
     }
 
-    resp = do_post(q, v)
-    assert not resp.get('errors', None)
+    body = do_post(q, v).get('body')
+    assert not body.get('errors', None)
 
     # Get the project and team so they can be deleted.
     rally_project = syn_client.get(
-        resp['data']['createRally']['rally']['synId'])
+        body['data']['createRally']['rally']['synId'])
     syn_test_helper_session.dispose_of(rally_project)
 
     rally = Rally.from_project(rally_project)
@@ -325,9 +330,9 @@ def test_handler_get_rally_sprint(mocker):
     mock = mocker.patch.object(RallyQuery, 'resolve_rally_sprint')
     mock.return_value = RallySprint(synId=expected_syn_id)
 
-    resp = do_post(q, v)
-    assert not resp.get('errors', None)
-    assert resp['data']['rallySprint']['synId'] == expected_syn_id
+    body = do_post(q, v).get('body')
+    assert not body.get('errors', None)
+    assert body['data']['rallySprint']['synId'] == expected_syn_id
 
 
 def test_query_rally_sprint(rally_setup, rally_sprint):
@@ -345,11 +350,11 @@ def test_query_rally_sprint(rally_setup, rally_sprint):
         'sprintLetter': rally_sprint.letter
     }
 
-    resp = do_post(q, v)
-    assert not resp.get('errors', None)
-    assert resp['data']['rallySprint'] != None
-    assert resp['data']['rallySprint']['synId'] == rally_sprint.synId
-    assert resp['data']['rallySprint']['letter'] == rally_sprint.letter
+    body = do_post(q, v).get('body')
+    assert not body.get('errors', None)
+    assert body['data']['rallySprint'] != None
+    assert body['data']['rallySprint']['synId'] == rally_sprint.synId
+    assert body['data']['rallySprint']['letter'] == rally_sprint.letter
 
 
 def test_create_rally_sprint(rally_setup, rally, syn_client, syn_test_helper_session):
@@ -396,10 +401,10 @@ def test_create_rally_sprint(rally_setup, rally, syn_client, syn_test_helper_ses
         'posts': posts
     }
 
-    resp = do_post(q, v)
-    assert not resp.get('errors', None)
+    body = do_post(q, v).get('body')
+    assert not body.get('errors', None)
 
     # Get the project and team so they can be deleted.
     rally_project_sprint = syn_client.get(
-        resp['data']['createRallySprint']['rallySprint']['synId'])
+        body['data']['createRallySprint']['rallySprint']['synId'])
     syn_test_helper_session.dispose_of(rally_project_sprint)

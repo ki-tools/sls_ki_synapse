@@ -26,7 +26,7 @@ def generatePolicy(principalId, effect, methodArn):
 def authenticate(event, context):
     logging.debug('Event Received: authenticate')
 
-    token = event['authorizationToken']
+    token = event['authorizationToken'].replace('Bearer ', '')
 
     api_key = Auth.authenticate(token)
 

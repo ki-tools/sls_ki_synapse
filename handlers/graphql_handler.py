@@ -17,8 +17,10 @@ def graphql(event, context):
     """
     logging.debug('Event Received: graphql: {}'.format(json.dumps(event)))
 
+    body = json.loads(event['body'])
+
     # Execute the GraphQL query.
-    execution_results, _ = run_http_query(schema.root(), 'post', event)
+    execution_results, _ = run_http_query(schema.root(), 'post', body)
 
     # Get the results and status code for the response.
     result, status_code = encode_execution_results(
@@ -26,13 +28,10 @@ def graphql(event, context):
 
     # Build the response with the status code and GraphQL results.
     response = {
-        'statusCode': status_code
+        'statusCode': status_code,
+        'body': json.dumps(result)
     }
-    response.update(result)
 
-    # JSON encode the response.
-    json_response = json.dumps(response)
+    logging.debug('Event Response: graphql: {}'.format(json.dumps(response)))
 
-    logging.debug('Event Response: graphql: {}'.format(json_response))
-
-    return json_response
+    return response

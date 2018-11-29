@@ -28,6 +28,7 @@ functions:
           path: /graphql
           method: POST
           authorizer: auth
+          cors: true
   auth:
     handler: handlers/auth_handler.authenticate
 

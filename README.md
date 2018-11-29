@@ -64,11 +64,11 @@ The process for allowing a client access to the service is as follows:
 
 - View Logs: `sls logs -f graphql --tail`
 - Test Queries:
-  - Get a SynProject:  `sls invoke -f graphql -p tests/handlers/test_json/get_syn_project.json`
-  - Create a SynProject: `sls invoke -f graphql -p tests/handlers/test_json/create_syn_project.json`
-  - Update a SynProject: `sls invoke -f graphql -p tests/handlers/test_json/update_syn_project.json`
-  - Create a Rally: `sls invoke -f graphql -p tests/handlers/test_json/create_rally.json`
-  - Get a Rally:  `sls invoke -f graphql -p tests/handlers/test_json/get_rally.json`
-  - Create a Rally Sprint: `sls invoke -f graphql -p tests/handlers/test_json/create_rally_sprint.json`
-  - Get a Rally Sprint:  `sls invoke -f graphql -p tests/handlers/test_json/get_rally_sprint.json`
+  - Get a SynProject:  `./scripts/json_to_gql.py tests/handlers/test_json/get_syn_project.json | sls invoke -f graphql`
+  - Create a SynProject: `./scripts/json_to_gql.py tests/handlers/test_json/create_syn_project.json | sls invoke -f graphql`
+  - Update a SynProject: `./scripts/json_to_gql.py tests/handlers/test_json/update_syn_project.json | sls invoke -f graphql`
+  - Create a Rally: `./scripts/json_to_gql.py tests/handlers/test_json/create_rally.json | sls invoke -f graphql`
+  - Get a Rally:  `./scripts/json_to_gql.py tests/handlers/test_json/get_rally.json | sls invoke -f graphql`
+  - Create a Rally Sprint: `./scripts/json_to_gql.py tests/handlers/test_json/create_rally_sprint.json | sls invoke -f graphql`
+  - Get a Rally Sprint:  `./scripts/json_to_gql.py tests/handlers/test_json/get_rally_sprint.json | sls invoke -f graphql`
   - With curl: `curl -X POST -H 'Authorization: Bearer JWT_TOKEN_HERE' --data 'QUERY_HERE' ENDPOINT_URL_HERE`
