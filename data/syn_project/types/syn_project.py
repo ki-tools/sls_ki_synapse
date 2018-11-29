@@ -3,7 +3,7 @@ import graphene
 
 class SynProject(graphene.ObjectType):
     """
-    Defines the Rally type.
+    Defines the SynProject type.
     """
     id = graphene.String()
     name = graphene.String()
@@ -11,7 +11,7 @@ class SynProject(graphene.ObjectType):
     @staticmethod
     def from_project(project):
         """
-        Converts a Project to a Rally.
+        Converts a Project to a SynProject.
         """
         return SynProject(
             id=project.id,
