@@ -8,6 +8,9 @@ A [Serverless](https://serverless.com/framework/docs/getting-started) applicatio
 
 Capabilities:
 
+- [Create a Project](tests/handlers/test_json/create_syn_project.json)
+- [Update a Project](tests/handlers/test_json/update_syn_project.json)
+- [Get a Project](tests/handlers/test_json/get_syn_project.json)
 - [Create a Rally](tests/handlers/test_json/create_rally.json)
 - [Get a Rally](tests/handlers/test_json/get_rally.json)
 - [Create a Rally Sprint](tests/handlers/test_json/create_rally_sprint.json)
