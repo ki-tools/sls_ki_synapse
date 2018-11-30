@@ -13,34 +13,10 @@
 # limitations under the License.
 
 import graphene
-from .syn_project import (SynProjectQuery, SynProjectMutation)
-from .slide_deck import SlideDeckMutation
-from .rally import (RallyQuery, RallyMutation)
 
 
-class Query(
-        SynProjectQuery,
-        RallyQuery,
-        graphene.ObjectType):
+class SlideDeck(graphene.ObjectType):
     """
-    Root Query Class.
+    Defines the SlideDeck type.
     """
-    pass
-
-
-class Mutation(
-        SynProjectMutation,
-        SlideDeckMutation,
-        RallyMutation,
-        graphene.ObjectType):
-    """
-    Root Mutation Class.
-    """
-    pass
-
-
-def root():
-    """
-    Gets the GraphQL schema for the application.
-    """
-    return graphene.Schema(query=Query, mutation=Mutation)
+    url = graphene.String()

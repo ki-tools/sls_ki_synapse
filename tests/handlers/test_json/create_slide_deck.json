@@ -1,0 +1,18 @@
+{
+    "query": "mutation CreateSlideDeck($title: String!, $presenter: String!, $sprintId: String!, $participants: [String]!, $endDate: String!, $sprintQuestions: [String]!, $background: String!, $problemStatement: String!, $motivation: String!, $deliverables: [String]!, $keyFindings: [String]!, $nextSteps: [String]!, $value: String!) { createSlideDeck(title: $title, presenter: $presenter, sprintId: $sprintId, participants: $participants, endDate: $endDate, sprintQuestions: $sprintQuestions, background: $background, problemStatement: $problemStatement, motivation: $motivation, deliverables: $deliverables, keyFindings: $keyFindings, nextSteps: $nextSteps, value: $value) { slideDeck { url } } }",
+    "variables": {
+        "title": "My Title",
+        "presenter": "Name1",
+        "sprintId": "A",
+        "participants": ["Name1", "Name2", "Name3"],
+        "endDate": "2018-01-01",
+        "sprintQuestions": ["Question1", "Question2", "Question3"],
+        "background": "Some Background Info",
+        "problemStatement": "Some Problems",
+        "motivation": "Some Motivation",
+        "deliverables": ["Deliverable1", "Deliverable2", "Deliverable3"],
+        "keyFindings": ["Finding1", "Finding2", "Finding3"],
+        "nextSteps": ["Step1", "Step2", "Step3"],
+        "value": "Some Value"
+    }
+}

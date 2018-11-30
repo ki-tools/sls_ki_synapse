@@ -17,9 +17,17 @@ from handlers import graphql_handler
 from synapseclient import EntityViewSchema
 import time
 import json
+import boto3
+from moto import mock_s3
 from core import (ParamStore, Synapse)
 from data.syn_project import (SynProject, SynProjectQuery)
+from data.slide_deck import (SlideDeck, CreateSlideDeck)
 from data.rally import (Rally, RallySprint, RallyQuery)
+
+
+@pytest.fixture
+def s3_client():
+    return boto3.client('s3')
 
 
 def do_post(query, variables):
@@ -422,3 +430,82 @@ def test_create_rally_sprint(rally_setup, rally, syn_client, syn_test_helper_ses
     rally_project_sprint = syn_client.get(
         body['data']['createRallySprint']['rallySprint']['synId'])
     syn_test_helper_session.dispose_of(rally_project_sprint)
+
+
+###################################################################################################
+# SynProject
+###################################################################################################
+
+def test_handler_create_slide_deck(mocker):
+    q = """
+        mutation CreateSlideDeck($title: String!, $presenter: String!, $sprintId: String!, $participants: [String]!, $endDate: String!, $sprintQuestions: [String]!, $background: String!, $problemStatement: String!, $motivation: String!, $deliverables: [String]!, $keyFindings: [String]!, $nextSteps: [String]!, $value: String!) {
+            createSlideDeck(title: $title, presenter: $presenter, sprintId: $sprintId, participants: $participants, endDate: $endDate, sprintQuestions: $sprintQuestions, background: $background, problemStatement: $problemStatement, motivation: $motivation, deliverables: $deliverables, keyFindings: $keyFindings, nextSteps: $nextSteps, value: $value) {
+                slideDeck {
+                    url
+                }
+            }
+        }
+    """
+    v = {
+        'title': 'My Title',
+        'presenter': 'Name1',
+        'sprintId': 'A',
+        'participants': ['Name1', 'Name2', 'Name3'],
+        'endDate': '2018-01-01',
+        'sprintQuestions': ['Question1', 'Question2', 'Question3'],
+        'background': 'Some Background Info',
+        'problemStatement': 'Some Problems',
+        'motivation': 'Some Motivation',
+        'deliverables': ['Deliverable1', 'Deliverable2', 'Deliverable3'],
+        'keyFindings': ['Finding1', 'Finding2', 'Finding3'],
+        'nextSteps': ['Step1', 'Step2', 'Step3'],
+        'value': 'Some Value'
+    }
+
+    expected_url = 'http://test.com'
+
+    # TODO: Figure out why this mock is not working. It still calls the original method.
+    #
+    # mock = mocker.patch.object(CreateSlideDeck, 'mutate')
+    # mock.return_value = SlideDeck(url=expected_url)
+
+    # body = do_post(q, v).get('body')
+    # assert not body.get('errors', None)
+    # assert body['data']['slideDeck']['url'] == expected_url
+
+
+@mock_s3
+def test_create_slide_deck(s3_client):
+    # Create a mock bucket to store the ppt file.
+    s3_client.create_bucket(Bucket=ParamStore.SLIDE_DECKS_BUCKET_NAME())
+
+    q = """
+        mutation CreateSlideDeck($title: String!, $presenter: String!, $sprintId: String!, $participants: [String]!, $endDate: String!, $sprintQuestions: [String]!, $background: String!, $problemStatement: String!, $motivation: String!, $deliverables: [String]!, $keyFindings: [String]!, $nextSteps: [String]!, $value: String!) {
+            createSlideDeck(title: $title, presenter: $presenter, sprintId: $sprintId, participants: $participants, endDate: $endDate, sprintQuestions: $sprintQuestions, background: $background, problemStatement: $problemStatement, motivation: $motivation, deliverables: $deliverables, keyFindings: $keyFindings, nextSteps: $nextSteps, value: $value) {
+                slideDeck {
+                    url
+                }
+            }
+        }
+    """
+    v = {
+        'title': 'My Title',
+        'presenter': 'Name1',
+        'sprintId': 'A',
+        'participants': ['Name1', 'Name2', 'Name3'],
+        'endDate': '2018-01-01',
+        'sprintQuestions': ['Question1', 'Question2', 'Question3'],
+        'background': 'Some Background Info',
+        'problemStatement': 'Some Problems',
+        'motivation': 'Some Motivation',
+        'deliverables': ['Deliverable1', 'Deliverable2', 'Deliverable3'],
+        'keyFindings': ['Finding1', 'Finding2', 'Finding3'],
+        'nextSteps': ['Step1', 'Step2', 'Step3'],
+        'value': 'Some Value'
+    }
+
+    body = do_post(q, v).get('body')
+    assert not body.get('errors', None)
+    jslide_deck = body['data']['createSlideDeck']['slideDeck']
+    assert jslide_deck['url'] != None
+    assert ParamStore.SLIDE_DECKS_BUCKET_NAME() in jslide_deck['url']
