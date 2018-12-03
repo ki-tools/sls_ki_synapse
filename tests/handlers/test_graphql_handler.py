@@ -226,6 +226,93 @@ def test_update_syn_project(syn_client, syn_test_helper):
 
 
 ###################################################################################################
+# SlideDeck
+###################################################################################################
+
+def test_handler_create_slide_deck(mocker):
+    q = """
+        mutation CreateSlideDeck($title: String!, $presenter: String!, $sprintId: String!, $participants: [String]!, $endDate: String!, $sprintQuestions: [String]!, $background: String!, $problemStatement: String!, $motivation: String!, $deliverables: [String]!, $keyFindings: [String]!, $nextSteps: [String]!, $value: String!) {
+            createSlideDeck(title: $title, presenter: $presenter, sprintId: $sprintId, participants: $participants, endDate: $endDate, sprintQuestions: $sprintQuestions, background: $background, problemStatement: $problemStatement, motivation: $motivation, deliverables: $deliverables, keyFindings: $keyFindings, nextSteps: $nextSteps, value: $value) {
+                slideDeck {
+                    url
+                }
+            }
+        }
+    """
+    v = {
+        'synapseProjectId': 'syn0',
+        'title': 'My Title',
+        'presenter': 'Name1',
+        'sprintId': 'A',
+        'participants': ['Name1', 'Name2', 'Name3'],
+        'endDate': '2018-01-01',
+        'sprintQuestions': ['Question1', 'Question2', 'Question3'],
+        'background': 'Some Background Info',
+        'problemStatement': 'Some Problems',
+        'motivation': 'Some Motivation',
+        'deliverables': ['Deliverable1', 'Deliverable2', 'Deliverable3'],
+        'keyFindings': ['Finding1', 'Finding2', 'Finding3'],
+        'nextSteps': ['Step1', 'Step2', 'Step3'],
+        'value': 'Some Value'
+    }
+
+    expected_id = 'syn123'
+
+    # TODO: Figure out why this mock is not working. It still calls the original method.
+    #
+    # mock = mocker.patch.object(CreateSlideDeck, 'mutate')
+    # mock.return_value = SlideDeck(url=expected_url)
+
+    # body = do_post(q, v).get('body')
+    # assert not body.get('errors', None)
+    # jslide_deck = body['data']['createSlideDeck']['slideDeck']
+    # assert jslide_deck['synapseId'] == expected_id
+
+
+def test_create_slide_deck(syn_client, syn_test_helper):
+    project = syn_test_helper.create_project()
+
+    q = """
+        mutation CreateSlideDeck($synapseProjectId: String!, $title: String!, $presenter: String!, $sprintId: String!, $participants: [String]!, $endDate: String!, $sprintQuestions: [String]!, $background: String!, $problemStatement: String!, $motivation: String!, $deliverables: [String]!, $keyFindings: [String]!, $nextSteps: [String]!, $value: String!) {
+            createSlideDeck(synapseProjectId: $synapseProjectId, title: $title, presenter: $presenter, sprintId: $sprintId, participants: $participants, endDate: $endDate, sprintQuestions: $sprintQuestions, background: $background, problemStatement: $problemStatement, motivation: $motivation, deliverables: $deliverables, keyFindings: $keyFindings, nextSteps: $nextSteps, value: $value) {
+                slideDeck {
+                    synapseId
+                }
+            }
+        }
+    """
+    v = {
+        'synapseProjectId': project.id,
+        'title': 'My Title',
+        'presenter': 'Name1',
+        'sprintId': 'A',
+        'participants': ['Name1', 'Name2', 'Name3'],
+        'endDate': '2018-01-01',
+        'sprintQuestions': ['Question1', 'Question2', 'Question3'],
+        'background': 'Some Background Info',
+        'problemStatement': 'Some Problems',
+        'motivation': 'Some Motivation',
+        'deliverables': ['Deliverable1', 'Deliverable2', 'Deliverable3'],
+        'keyFindings': ['Finding1', 'Finding2', 'Finding3'],
+        'nextSteps': ['Step1', 'Step2', 'Step3'],
+        'value': 'Some Value'
+    }
+
+    body = do_post(q, v).get('body')
+    assert not body.get('errors', None)
+    jslide_deck = body['data']['createSlideDeck']['slideDeck']
+    assert jslide_deck['synapseId'] != None
+    file = syn_client.get(jslide_deck['synapseId'], downloadFile=False)
+    assert file != None
+
+    # Updates the file
+    body = do_post(q, v).get('body')
+    assert not body.get('errors', None)
+    jslide_deck = body['data']['createSlideDeck']['slideDeck']
+    file_v2 = syn_client.get(jslide_deck['synapseId'], downloadFile=False)
+    assert file_v2.versionNumber > file.versionNumber
+
+###################################################################################################
 # Rally
 ###################################################################################################
 
@@ -423,89 +510,3 @@ def test_create_rally_sprint(rally_setup, rally, syn_client, syn_test_helper_ses
     rally_project_sprint = syn_client.get(
         body['data']['createRallySprint']['rallySprint']['synId'])
     syn_test_helper_session.dispose_of(rally_project_sprint)
-
-
-###################################################################################################
-# SynProject
-###################################################################################################
-
-def test_handler_create_slide_deck(mocker):
-    q = """
-        mutation CreateSlideDeck($title: String!, $presenter: String!, $sprintId: String!, $participants: [String]!, $endDate: String!, $sprintQuestions: [String]!, $background: String!, $problemStatement: String!, $motivation: String!, $deliverables: [String]!, $keyFindings: [String]!, $nextSteps: [String]!, $value: String!) {
-            createSlideDeck(title: $title, presenter: $presenter, sprintId: $sprintId, participants: $participants, endDate: $endDate, sprintQuestions: $sprintQuestions, background: $background, problemStatement: $problemStatement, motivation: $motivation, deliverables: $deliverables, keyFindings: $keyFindings, nextSteps: $nextSteps, value: $value) {
-                slideDeck {
-                    url
-                }
-            }
-        }
-    """
-    v = {
-        'title': 'My Title',
-        'presenter': 'Name1',
-        'sprintId': 'A',
-        'participants': ['Name1', 'Name2', 'Name3'],
-        'endDate': '2018-01-01',
-        'sprintQuestions': ['Question1', 'Question2', 'Question3'],
-        'background': 'Some Background Info',
-        'problemStatement': 'Some Problems',
-        'motivation': 'Some Motivation',
-        'deliverables': ['Deliverable1', 'Deliverable2', 'Deliverable3'],
-        'keyFindings': ['Finding1', 'Finding2', 'Finding3'],
-        'nextSteps': ['Step1', 'Step2', 'Step3'],
-        'value': 'Some Value'
-    }
-
-    expected_url = 'http://test.com'
-
-    # TODO: Figure out why this mock is not working. It still calls the original method.
-    #
-    # mock = mocker.patch.object(CreateSlideDeck, 'mutate')
-    # mock.return_value = SlideDeck(url=expected_url)
-
-    # body = do_post(q, v).get('body')
-    # assert not body.get('errors', None)
-    # assert body['data']['slideDeck']['url'] == expected_url
-
-
-def test_create_slide_deck(syn_client, syn_test_helper):
-    project = syn_test_helper.create_project()
-
-    q = """
-        mutation CreateSlideDeck($synapseProjectId: String!, $title: String!, $presenter: String!, $sprintId: String!, $participants: [String]!, $endDate: String!, $sprintQuestions: [String]!, $background: String!, $problemStatement: String!, $motivation: String!, $deliverables: [String]!, $keyFindings: [String]!, $nextSteps: [String]!, $value: String!) {
-            createSlideDeck(synapseProjectId: $synapseProjectId, title: $title, presenter: $presenter, sprintId: $sprintId, participants: $participants, endDate: $endDate, sprintQuestions: $sprintQuestions, background: $background, problemStatement: $problemStatement, motivation: $motivation, deliverables: $deliverables, keyFindings: $keyFindings, nextSteps: $nextSteps, value: $value) {
-                slideDeck {
-                    synapseId
-                }
-            }
-        }
-    """
-    v = {
-        'synapseProjectId': project.id,
-        'title': 'My Title',
-        'presenter': 'Name1',
-        'sprintId': 'A',
-        'participants': ['Name1', 'Name2', 'Name3'],
-        'endDate': '2018-01-01',
-        'sprintQuestions': ['Question1', 'Question2', 'Question3'],
-        'background': 'Some Background Info',
-        'problemStatement': 'Some Problems',
-        'motivation': 'Some Motivation',
-        'deliverables': ['Deliverable1', 'Deliverable2', 'Deliverable3'],
-        'keyFindings': ['Finding1', 'Finding2', 'Finding3'],
-        'nextSteps': ['Step1', 'Step2', 'Step3'],
-        'value': 'Some Value'
-    }
-
-    body = do_post(q, v).get('body')
-    assert not body.get('errors', None)
-    jslide_deck = body['data']['createSlideDeck']['slideDeck']
-    assert jslide_deck['synapseId'] != None
-    file = syn_client.get(jslide_deck['synapseId'], downloadFile=False)
-    assert file != None
-
-    # Updates the file
-    body = do_post(q, v).get('body')
-    assert not body.get('errors', None)
-    jslide_deck = body['data']['createSlideDeck']['slideDeck']
-    file_v2 = syn_client.get(jslide_deck['synapseId'], downloadFile=False)
-    assert file_v2.versionNumber > file.versionNumber
