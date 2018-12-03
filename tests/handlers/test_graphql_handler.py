@@ -17,17 +17,10 @@ from handlers import graphql_handler
 from synapseclient import EntityViewSchema
 import time
 import json
-import boto3
-from moto import mock_s3
 from core import (ParamStore, Synapse)
 from data.syn_project import (SynProject, SynProjectQuery)
 from data.slide_deck import (SlideDeck, CreateSlideDeck)
 from data.rally import (Rally, RallySprint, RallyQuery)
-
-
-@pytest.fixture
-def s3_client():
-    return boto3.client('s3')
 
 
 def do_post(query, variables):
@@ -474,21 +467,20 @@ def test_handler_create_slide_deck(mocker):
     # assert body['data']['slideDeck']['url'] == expected_url
 
 
-@mock_s3
-def test_create_slide_deck(s3_client):
-    # Create a mock bucket to store the ppt file.
-    s3_client.create_bucket(Bucket=ParamStore.SLIDE_DECKS_BUCKET_NAME())
+def test_create_slide_deck(syn_client, syn_test_helper):
+    project = syn_test_helper.create_project()
 
     q = """
-        mutation CreateSlideDeck($title: String!, $presenter: String!, $sprintId: String!, $participants: [String]!, $endDate: String!, $sprintQuestions: [String]!, $background: String!, $problemStatement: String!, $motivation: String!, $deliverables: [String]!, $keyFindings: [String]!, $nextSteps: [String]!, $value: String!) {
-            createSlideDeck(title: $title, presenter: $presenter, sprintId: $sprintId, participants: $participants, endDate: $endDate, sprintQuestions: $sprintQuestions, background: $background, problemStatement: $problemStatement, motivation: $motivation, deliverables: $deliverables, keyFindings: $keyFindings, nextSteps: $nextSteps, value: $value) {
+        mutation CreateSlideDeck($synapseProjectId: String!, $title: String!, $presenter: String!, $sprintId: String!, $participants: [String]!, $endDate: String!, $sprintQuestions: [String]!, $background: String!, $problemStatement: String!, $motivation: String!, $deliverables: [String]!, $keyFindings: [String]!, $nextSteps: [String]!, $value: String!) {
+            createSlideDeck(synapseProjectId: $synapseProjectId, title: $title, presenter: $presenter, sprintId: $sprintId, participants: $participants, endDate: $endDate, sprintQuestions: $sprintQuestions, background: $background, problemStatement: $problemStatement, motivation: $motivation, deliverables: $deliverables, keyFindings: $keyFindings, nextSteps: $nextSteps, value: $value) {
                 slideDeck {
-                    url
+                    synapseId
                 }
             }
         }
     """
     v = {
+        'synapseProjectId': project.id,
         'title': 'My Title',
         'presenter': 'Name1',
         'sprintId': 'A',
@@ -507,5 +499,13 @@ def test_create_slide_deck(s3_client):
     body = do_post(q, v).get('body')
     assert not body.get('errors', None)
     jslide_deck = body['data']['createSlideDeck']['slideDeck']
-    assert jslide_deck['url'] != None
-    assert ParamStore.SLIDE_DECKS_BUCKET_NAME() in jslide_deck['url']
+    assert jslide_deck['synapseId'] != None
+    file = syn_client.get(jslide_deck['synapseId'], downloadFile=False)
+    assert file != None
+
+    # Updates the file
+    body = do_post(q, v).get('body')
+    assert not body.get('errors', None)
+    jslide_deck = body['data']['createSlideDeck']['slideDeck']
+    file_v2 = syn_client.get(jslide_deck['synapseId'], downloadFile=False)
+    assert file_v2.versionNumber > file.versionNumber

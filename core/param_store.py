@@ -120,7 +120,3 @@ class ParamStore:
         String of comma separated keys that are used for API access.
         """
         return cls.get('JWT_API_KEYS', default)
-
-    @classmethod
-    def SLIDE_DECKS_BUCKET_NAME(cls, default=None):
-        return cls.get('SLIDE_DECKS_BUCKET_NAME', default)

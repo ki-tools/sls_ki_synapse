@@ -14,19 +14,11 @@ provider:
   environment:
     SERVICE_NAME: "${self:service}"
     SERVICE_STAGE: "${self:provider.stage}"
-    SLIDE_DECKS_BUCKET_NAME: ${self:custom.slideDeckBucketName}
   iamRoleStatements:
     - Effect: "Allow"
       Action:
         - "ssm:GetParameter"
       Resource: { "Fn::Join" : ["", ["arn:aws:ssm:${self:provider.region}:", { "Ref" : "AWS::AccountId" }, ":parameter/${self:service}/${self:provider.stage}/*" ] ]  }
-    - Effect: Allow
-      Action:
-        - s3:PutObject
-        - s3:GetObject
-        - s3:DeleteObject
-      Resource:
-        - 'arn:aws:s3:::${self:custom.slideDeckBucketName}/*'
 
 functions:
   graphql:
@@ -40,16 +32,7 @@ functions:
   auth:
     handler: handlers/auth_handler.authenticate
 
-resources:
-  Resources:
-    slideDeckBucket:
-      Type: "AWS::S3::Bucket"
-      Properties:
-        BucketName: ${self:custom.slideDeckBucketName}
-
-
 custom:
-  slideDeckBucketName: "${self:service}-slide-decks-${self:provider.stage}"
   pythonRequirements:
     dockerizePip: non-linux
      # Do not slim the dependencies. PIL/Pillow needs the .pyc files
