@@ -1,5 +1,5 @@
 {
-    "query": "mutation CreateSlideDeck($synapseProjectId: String!, $title: String!, $presenter: String!, $sprintId: String!, $participants: [String]!, $endDate: String!, $sprintQuestions: [String]!, $background: String!, $problemStatement: String!, $motivation: String!, $deliverables: [String]!, $keyFindings: [String]!, $nextSteps: [String]!, $value: String!) { createSlideDeck(synapseProjectId: $synapseProjectId, title: $title, presenter: $presenter, sprintId: $sprintId, participants: $participants, endDate: $endDate, sprintQuestions: $sprintQuestions, background: $background, problemStatement: $problemStatement, motivation: $motivation, deliverables: $deliverables, keyFindings: $keyFindings, nextSteps: $nextSteps, value: $value) { slideDeck { synapseId } } }",
+    "query": "mutation CreateSlideDeck($synapseProjectId: String!, $title: String!, $presenter: String!, $sprintId: String!, $participants: [String]!, $endDate: String!, $sprintQuestions: [String]!, $background: String!, $problemStatement: String!, $motivation: String!, $deliverables: [String]!, $keyFindings: [String]!, $nextSteps: [String]!, $value: String!, $templateUrl: String) { createSlideDeck(synapseProjectId: $synapseProjectId, title: $title, presenter: $presenter, sprintId: $sprintId, participants: $participants, endDate: $endDate, sprintQuestions: $sprintQuestions, background: $background, problemStatement: $problemStatement, motivation: $motivation, deliverables: $deliverables, keyFindings: $keyFindings, nextSteps: $nextSteps, value: $value, templateUrl: $templateUrl) { slideDeck { synapseId } } }",
     "variables": {
         "synapseProjectId": "syn17080111",
         "title": "My Title",
@@ -14,6 +14,7 @@
         "deliverables": ["Deliverable1", "Deliverable2", "Deliverable3"],
         "keyFindings": ["Finding1", "Finding2", "Finding3"],
         "nextSteps": ["Step1", "Step2", "Step3"],
-        "value": "Some Value"
+        "value": "Some Value",
+        "templateUrl": null
     }
 }

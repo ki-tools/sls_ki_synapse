@@ -12,8 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from core import (log, Auth)
-import logging
+from core import Auth
+from core.log import logger
 
 
 def generatePolicy(principalId, effect, methodArn):
@@ -38,15 +38,15 @@ def generatePolicy(principalId, effect, methodArn):
 
 
 def authenticate(event, context):
-    logging.debug('Event Received: authenticate')
+    logger.debug('Event Received: authenticate')
 
     token = event['authorizationToken'].replace('Bearer ', '')
 
     api_key = Auth.authenticate(token)
 
     if api_key:
-        logging.debug('Event Response: Allow')
+        logger.debug('Event Response: Allow')
         return generatePolicy(api_key, 'Allow', event['methodArn'])
     else:
-        logging.debug('Event Response: Deny')
+        logger.debug('Event Response: Deny')
         return generatePolicy(None, 'Deny', event['methodArn'])

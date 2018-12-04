@@ -18,6 +18,7 @@ import json
 import requests
 import tempfile
 from core import (ParamStore, Synapse)
+from core.log import logger
 from ..types import SlideDeck
 from pptx import Presentation
 from synapseclient import Project, File
@@ -46,6 +47,8 @@ class CreateSlideDeck(graphene.Mutation):
         key_findings = graphene.List(graphene.String, required=True)
         next_steps = graphene.List(graphene.String, required=True)
         value = graphene.String(required=True)
+        template_url = graphene.String(
+            description='URL to a presentation to use as a template.')
 
     def mutate(self,
                info,
@@ -62,12 +65,35 @@ class CreateSlideDeck(graphene.Mutation):
                deliverables,
                key_findings,
                next_steps,
-               value):
+               value,
+               **kwargs):
+        template_url = kwargs.get('template_url', None)
 
         project = Synapse.client().get(Project(id=synapse_project_id))
 
-        template_file = 'assets/template_ki_empty.pptx'
-        presentation = Presentation(template_file)
+        presentation = None
+
+        if template_url and template_url != '':
+            logger.debug('Fetching template file: {0}'.format(template_url))
+            r = requests.get(template_url)
+            logger.debug('Done fetching template file.')
+
+            if r.status_code == 200:
+                fd, tmp_filename = tempfile.mkstemp(suffix='.pptx')
+                
+                try:
+                    with os.fdopen(fd, 'wb') as tmp:
+                        tmp.write(r.content)
+
+                    presentation = Presentation(tmp_filename)
+                finally:
+                    if os.path.isfile(tmp_filename):
+                        os.remove(tmp_filename)
+            else:
+                raise Exception(
+                    'Could not load template_url: {0}'.format(template_url))
+        else:
+            presentation = Presentation('assets/template_ki_empty.pptx')
 
         SLD_TITLE = 0
         SLD_HEAD_COPY = 1
@@ -195,11 +221,14 @@ class CreateSlideDeck(graphene.Mutation):
 
         presentation.save(ppt_file)
 
-        # Store the file in Synapse
-        syn_file = Synapse.client().store(File(ppt_file, parent=project))
-
-        if os.path.isfile(ppt_file):
-            os.remove(ppt_file)
+        try:
+            # Store the file in Synapse
+            logger.debug('Uploading file to Synapse.')
+            syn_file = Synapse.client().store(File(ppt_file, parent=project))
+            logger.debug('Finished uploading file to Synapse.')
+        finally:
+            if os.path.isfile(ppt_file):
+                os.remove(ppt_file)
 
         new_slide_deck = SlideDeck(synapse_id=syn_file.id)
 
