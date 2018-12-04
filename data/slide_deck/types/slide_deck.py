@@ -12,16 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import logging
-from .param_store import ParamStore
+import graphene
 
-"""
-Setup the logger.
-"""
-logger = logging.getLogger()
 
-if logger.handlers:
-    for handler in logger.handlers:
-        logger.removeHandler(handler)
-
-logging.basicConfig(level=logging.getLevelName(ParamStore.LOG_LEVEL(default='INFO')))
+class SlideDeck(graphene.ObjectType):
+    """
+    Defines the SlideDeck type.
+    """
+    synapse_id = graphene.String()

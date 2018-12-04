@@ -10,7 +10,7 @@ provider:
   stage: ${opt:stage, 'dev'}
   profile: ${file(./private.sls.deploy.json):${self:provider.stage}.AWS_PROFILE}
   region: ${file(./private.sls.deploy.json):${self:provider.stage}.AWS_REGION}
-  timeout: 900
+  timeout: 30
   environment:
     SERVICE_NAME: "${self:service}"
     SERVICE_STAGE: "${self:provider.stage}"
@@ -34,7 +34,9 @@ functions:
 
 custom:
   pythonRequirements:
-    slim: true
+    dockerizePip: non-linux
+     # Do not slim the dependencies. PIL/Pillow needs the .pyc files
+    slim: false
     noDeploy:
       - pytest
 
@@ -42,6 +44,7 @@ package:
   exclude:
     - private.*
     - .venv/**
+    - .vscode/**
     - node_modules/**
     - __pycache__/**
     - .pytest_cache/**

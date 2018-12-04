@@ -15,8 +15,7 @@
 import os
 import sys
 import json
-from core import log
-import logging
+from core.log import logger
 from data import schema
 from graphql_server import (
     run_http_query,
@@ -29,7 +28,7 @@ def graphql(event, context):
     """
     Handles the graphql event.
     """
-    logging.debug('Event Received: graphql: {}'.format(json.dumps(event)))
+    logger.debug('Event Received: graphql: {}'.format(json.dumps(event)))
 
     body = json.loads(event['body'])
 
@@ -46,6 +45,6 @@ def graphql(event, context):
         'body': json.dumps(result)
     }
 
-    logging.debug('Event Response: graphql: {}'.format(json.dumps(response)))
+    logger.debug('Event Response: graphql: {}'.format(json.dumps(response)))
 
     return response

@@ -17,8 +17,10 @@ from handlers import graphql_handler
 from synapseclient import EntityViewSchema
 import time
 import json
+import responses
 from core import (ParamStore, Synapse)
 from data.syn_project import (SynProject, SynProjectQuery)
+from data.slide_deck import (SlideDeck, CreateSlideDeck)
 from data.rally import (Rally, RallySprint, RallyQuery)
 
 
@@ -222,6 +224,117 @@ def test_update_syn_project(syn_client, syn_test_helper):
                              for r in acl['resourceAccess']]
 
     assert int(removed_perm['principalId']) not in current_principal_ids
+
+
+###################################################################################################
+# SlideDeck
+###################################################################################################
+
+def test_handler_create_slide_deck(mocker):
+    q = """
+        mutation CreateSlideDeck($synapseProjectId: String!, $title: String!, $presenter: String!, $sprintId: String!, $participants: [String]!, $endDate: String!, $sprintQuestions: [String]!, $background: String!, $problemStatement: String!, $motivation: String!, $deliverables: [String]!, $keyFindings: [String]!, $nextSteps: [String]!, $value: String!, $templateUrl: String) {
+            createSlideDeck(synapseProjectId: $synapseProjectId, title: $title, presenter: $presenter, sprintId: $sprintId, participants: $participants, endDate: $endDate, sprintQuestions: $sprintQuestions, background: $background, problemStatement: $problemStatement, motivation: $motivation, deliverables: $deliverables, keyFindings: $keyFindings, nextSteps: $nextSteps, value: $value, templateUrl: $templateUrl) {
+                slideDeck {
+                    synapseId
+                }
+            }
+        }
+    """
+    v = {
+        'synapseProjectId': 'syn0',
+        'title': 'My Title',
+        'presenter': 'Name1',
+        'sprintId': 'A',
+        'participants': ['Name1', 'Name2', 'Name3'],
+        'endDate': '2018-01-01',
+        'sprintQuestions': ['Question1', 'Question2', 'Question3'],
+        'background': 'Some Background Info',
+        'problemStatement': 'Some Problems',
+        'motivation': 'Some Motivation',
+        'deliverables': ['Deliverable1', 'Deliverable2', 'Deliverable3'],
+        'keyFindings': ['Finding1', 'Finding2', 'Finding3'],
+        'nextSteps': ['Step1', 'Step2', 'Step3'],
+        'value': 'Some Value',
+        'templateUrl': None
+    }
+
+    expected_id = 'syn123'
+
+    # TODO: Figure out why this mock is not working. It still calls the original method.
+    #
+    # mock = mocker.patch.object(CreateSlideDeck, 'mutate')
+    # mock.return_value = SlideDeck(url=expected_url)
+
+    # body = do_post(q, v).get('body')
+    # assert not body.get('errors', None)
+    # jslide_deck = body['data']['createSlideDeck']['slideDeck']
+    # assert jslide_deck['synapseId'] == expected_id
+
+
+@responses.activate
+def test_create_slide_deck(syn_client, syn_test_helper):
+    for url in [
+        'https://repo-prod.prod.sagebase.org',
+        'https://auth-prod.prod.sagebase.org',
+        'https://file-prod.prod.sagebase.org',
+        'https://www.synapse.org',
+        'https://s3.amazonaws.com']:
+        responses.add_passthru(url)
+
+    project = syn_test_helper.create_project()
+
+    q = """
+        mutation CreateSlideDeck($synapseProjectId: String!, $title: String!, $presenter: String!, $sprintId: String!, $participants: [String]!, $endDate: String!, $sprintQuestions: [String]!, $background: String!, $problemStatement: String!, $motivation: String!, $deliverables: [String]!, $keyFindings: [String]!, $nextSteps: [String]!, $value: String!, $templateUrl: String) {
+            createSlideDeck(synapseProjectId: $synapseProjectId, title: $title, presenter: $presenter, sprintId: $sprintId, participants: $participants, endDate: $endDate, sprintQuestions: $sprintQuestions, background: $background, problemStatement: $problemStatement, motivation: $motivation, deliverables: $deliverables, keyFindings: $keyFindings, nextSteps: $nextSteps, value: $value, templateUrl: $templateUrl) {
+                slideDeck {
+                    synapseId
+                }
+            }
+        }
+    """
+    v = {
+        'synapseProjectId': project.id,
+        'title': 'My Title',
+        'presenter': 'Name1',
+        'sprintId': 'A',
+        'participants': ['Name1', 'Name2', 'Name3'],
+        'endDate': '2018-01-01',
+        'sprintQuestions': ['Question1', 'Question2', 'Question3'],
+        'background': 'Some Background Info',
+        'problemStatement': 'Some Problems',
+        'motivation': 'Some Motivation',
+        'deliverables': ['Deliverable1', 'Deliverable2', 'Deliverable3'],
+        'keyFindings': ['Finding1', 'Finding2', 'Finding3'],
+        'nextSteps': ['Step1', 'Step2', 'Step3'],
+        'value': 'Some Value'
+    }
+
+    body = do_post(q, v).get('body')
+    assert not body.get('errors', None)
+    jslide_deck = body['data']['createSlideDeck']['slideDeck']
+    assert jslide_deck['synapseId'] != None
+    file = syn_client.get(jslide_deck['synapseId'], downloadFile=False)
+    assert file != None
+
+    # Updates the file
+    body = do_post(q, v).get('body')
+    assert not body.get('errors', None)
+    jslide_deck = body['data']['createSlideDeck']['slideDeck']
+    file_v2 = syn_client.get(jslide_deck['synapseId'], downloadFile=False)
+    assert file_v2.versionNumber > file.versionNumber
+
+    # Uses the template_url
+    template_url = 'https://afakedomainname.com/file.pptx'
+    v['templateUrl'] = template_url
+
+    pptx = None
+    with open('assets/template_ki_empty.pptx', 'rb') as f:
+        pptx = f.read()
+
+    responses.add(responses.GET, template_url, body=pptx, status=200)
+
+    body = do_post(q, v).get('body')
+    assert not body.get('errors', None)
 
 
 ###################################################################################################

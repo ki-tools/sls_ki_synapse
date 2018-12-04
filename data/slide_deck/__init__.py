@@ -12,16 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import logging
-from .param_store import ParamStore
+from .mutations import (
+    SlideDeckMutation,
+    CreateSlideDeck
+)
 
-"""
-Setup the logger.
-"""
-logger = logging.getLogger()
-
-if logger.handlers:
-    for handler in logger.handlers:
-        logger.removeHandler(handler)
-
-logging.basicConfig(level=logging.getLevelName(ParamStore.LOG_LEVEL(default='INFO')))
+from .types import (
+    SlideDeck
+)
