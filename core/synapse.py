@@ -67,9 +67,6 @@ class Synapse:
             synapseclient.cache.CACHE_ROOT_DIR = os.path.join(
                 tempfile.gettempdir(), 'synapseCache')
 
-            # TODO: Remove when this is fixed: https://sagebionetworks.jira.com/browse/SYNPY-855
-            synapseclient.config.single_threaded = True
-
             syn_user = ParamStore.SYNAPSE_USERNAME()
             syn_pass = ParamStore.SYNAPSE_PASSWORD()
             cls._synapse_client = synapseclient.Synapse()
