@@ -106,7 +106,6 @@ def test_create_syn_project(syn_client, syn_test_helper):
             id
             name
           }
-          ok
         }
       }
     '''
@@ -183,7 +182,6 @@ def test_update_syn_project(syn_client, syn_test_helper):
             id
             name
           }
-          ok
         }
       }
     '''

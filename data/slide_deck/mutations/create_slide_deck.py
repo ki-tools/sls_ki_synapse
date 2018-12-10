@@ -28,7 +28,6 @@ class CreateSlideDeck(graphene.Mutation):
     """
     Mutation for creating a SlideDeck.
     """
-    ok = graphene.Boolean()
     slide_deck = graphene.Field(lambda: SlideDeck)
 
     class Arguments:
@@ -232,8 +231,7 @@ class CreateSlideDeck(graphene.Mutation):
 
         new_slide_deck = SlideDeck(synapse_id=syn_file.id)
 
-        is_ok = True
-        return CreateSlideDeck(slide_deck=new_slide_deck, ok=is_ok)
+        return CreateSlideDeck(slide_deck=new_slide_deck)
 
     @staticmethod
     def move_to_front(presentation):

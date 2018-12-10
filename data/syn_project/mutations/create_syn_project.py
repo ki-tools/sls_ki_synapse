@@ -27,7 +27,6 @@ class CreateSynProject(graphene.Mutation):
     """
     Mutation for creating a SynProject.
     """
-    ok = graphene.Boolean()
     syn_project = graphene.Field(lambda: SynProject)
 
     class Arguments:
@@ -96,5 +95,4 @@ class CreateSynProject(graphene.Mutation):
 
         new_syn_project = SynProject.from_project(project)
 
-        is_ok = True
-        return CreateSynProject(syn_project=new_syn_project, ok=is_ok)
+        return CreateSynProject(syn_project=new_syn_project)

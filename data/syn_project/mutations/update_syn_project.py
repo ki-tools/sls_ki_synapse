@@ -22,7 +22,6 @@ class UpdateSynProject(graphene.Mutation):
     """
     Mutation for updating a SynProject.
     """
-    ok = graphene.Boolean()
     syn_project = graphene.Field(lambda: SynProject)
 
     class Arguments:
@@ -77,5 +76,4 @@ class UpdateSynProject(graphene.Mutation):
         project = Synapse.client().store(project)
         updated_syn_project = SynProject.from_project(project)
 
-        is_ok = True
-        return UpdateSynProject(syn_project=updated_syn_project, ok=is_ok)
+        return UpdateSynProject(syn_project=updated_syn_project)
