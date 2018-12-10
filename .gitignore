@@ -23,3 +23,5 @@ var/
 /private.*
 node_modules
 jspm_packages
+.coverage
+htmlcov
