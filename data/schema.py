@@ -15,12 +15,10 @@
 import graphene
 from .syn_project import (SynProjectQuery, SynProjectMutation)
 from .slide_deck import SlideDeckMutation
-from .rally import (RallyQuery, RallyMutation)
 
 
 class Query(
         SynProjectQuery,
-        RallyQuery,
         graphene.ObjectType):
     """
     Root Query Class.
@@ -31,7 +29,6 @@ class Query(
 class Mutation(
         SynProjectMutation,
         SlideDeckMutation,
-        RallyMutation,
         graphene.ObjectType):
     """
     Root Mutation Class.
