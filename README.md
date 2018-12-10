@@ -14,12 +14,6 @@ Capabilities:
   - [Query](tests/handlers/test_json/get_syn_project.json)
 - Slide Deck:
   - [Create](tests/handlers/test_json/create_slide_deck.json)
-- Rally:
-  - [Create](tests/handlers/test_json/create_rally.json)
-  - [Query](tests/handlers/test_json/get_rally.json)
-- Rally Sprint:
-  - [Create](tests/handlers/test_json/create_rally_sprint.json)
-  - [Query](tests/handlers/test_json/get_rally_sprint.json)
 
 ## Development Setup
 
@@ -78,10 +72,4 @@ The process for allowing a client access to the service is as follows:
     - Query:  `./scripts/json_to_gql.py tests/handlers/test_json/get_syn_project.json | sls invoke -f graphql`
   - Slide Deck:
     - Query:  `./scripts/json_to_gql.py tests/handlers/test_json/create_slide_deck.json | sls invoke -f graphql`
-  - Rally:
-    - Create: `./scripts/json_to_gql.py tests/handlers/test_json/create_rally.json | sls invoke -f graphql`
-    - Query:  `./scripts/json_to_gql.py tests/handlers/test_json/get_rally.json | sls invoke -f graphql`
-  - Rally Sprint:
-    - Create: `./scripts/json_to_gql.py tests/handlers/test_json/create_rally_sprint.json | sls invoke -f graphql`
-    - Query:  `./scripts/json_to_gql.py tests/handlers/test_json/get_rally_sprint.json | sls invoke -f graphql`
   - With curl: `curl -X POST -H 'Authorization: Bearer JWT_TOKEN_HERE' --data 'QUERY_HERE' ENDPOINT_URL_HERE`
