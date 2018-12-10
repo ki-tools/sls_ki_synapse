@@ -1,10 +1,11 @@
 # SLS KI Synapse
 
 [![Build Status](https://travis-ci.com/pcstout/sls_ki_synapse.svg?branch=master)](https://travis-ci.com/pcstout/sls_ki_synapse)
+[![Coverage Status](https://coveralls.io/repos/github/pcstout/sls_ki_synapse/badge.svg?branch=master)](https://coveralls.io/github/pcstout/sls_ki_synapse?branch=master)
 
 ## Overview
 
-A [Serverless](https://serverless.com/framework/docs/getting-started) application that runs on [AWS Lambda](https://aws.amazon.com/lambda) exposing a [GraphQL](https://graphql.org) interface for maintaining Rallies in [Synapse](https://www.synapse.org).
+A [Serverless](https://serverless.com/framework/docs/getting-started) application that runs on [AWS Lambda](https://aws.amazon.com/lambda) exposing a [GraphQL](https://graphql.org) interface for maintaining Sprints in [Synapse](https://www.synapse.org).
 
 Capabilities:
 
