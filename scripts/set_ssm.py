@@ -46,18 +46,27 @@ def import_into_ssm(service_name, stage):
     os.environ['SERVICE_NAME'] = service_name
     os.environ['SERVICE_STAGE'] = stage
 
+    print('Setting SSM Values for: {0}'.format(stage))
+    print('')
+
     # Load the deploy variables so the AWS connection is available.
     deploy_config = load_json(os.path.join(
         script_dir, '..', 'private.sls.deploy.json')).get(stage)
     for key, value in deploy_config.items():
+        if isinstance(value, bool):
+            value = str(value).lower()
+        elif not isinstance(value, str):
+            value = str(value)
         os.environ[key] = value
 
     # Set the key/values.
     ssm_config = load_json(os.path.join(
         script_dir, '..', 'private.ssm.env.json')).get(stage)
     for key, value in ssm_config.items():
-        print('Setting SSM Key: {0}, Value: {1}'.format(key, value))
+        print('{0}: {1}'.format(key, value))
         ParamStore._set_ssm_parameter(key, value)
+
+    print('')
 
 
 def get_service_name():
@@ -77,9 +86,10 @@ def get_service_name():
 
 def main():
     parser = argparse.ArgumentParser()
-
-    parser.add_argument('stage', nargs='?', choices=[
-                        'production', 'staging', 'dev', 'test'], help='The deploy stage.', default='dev')
+    parser.add_argument('-s', '--stage',
+                        choices=['production', 'staging', 'dev', 'test'],
+                        help='The deploy stage.',
+                        default='dev')
     args = parser.parse_args()
 
     service_name = get_service_name()
