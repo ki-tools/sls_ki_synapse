@@ -81,7 +81,6 @@ class CreateSynProject(graphene.Mutation):
             forum_id = Synapse.client().restGET(
                 '/project/{0}/forum'.format(project.id)).get('id')
             for post in posts:
-                #body = {**post, **{'forumId': forum_id}}
                 body = {
                     'forumId': forum_id,
                     'title': post['title'],
