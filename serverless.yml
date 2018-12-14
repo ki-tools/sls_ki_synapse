@@ -3,17 +3,18 @@ service:
 
 plugins:
   - serverless-python-requirements
+  - serverless-domain-manager
 
 provider:
   name: aws
   runtime: python3.6
-  stage: ${opt:stage, 'dev'}
-  profile: ${file(./private.sls.deploy.json):${self:provider.stage}.AWS_PROFILE}
-  region: ${file(./private.sls.deploy.json):${self:provider.stage}.AWS_REGION}
+  stage: ${opt:stage, "dev"}
+  profile: ${self:custom.slsDeploy}.AWS_PROFILE}
+  region: ${self:custom.slsDeploy}.AWS_REGION}
   timeout: 30
   environment:
-    SERVICE_NAME: "${self:service}"
-    SERVICE_STAGE: "${self:provider.stage}"
+    SERVICE_NAME: ${self:service}
+    SERVICE_STAGE: ${self:provider.stage}
   iamRoleStatements:
     - Effect: "Allow"
       Action:
@@ -33,6 +34,14 @@ functions:
     handler: handlers/auth_handler.authenticate
 
 custom:
+  slsDeploy: ${file(./private.sls.deploy.json):${self:provider.stage}
+  customDomain:
+    enabled: ${self:custom.slsDeploy}.DOMAIN_ENABLED}
+    domainName: ${self:custom.slsDeploy}.DOMAIN_NAME}
+    basePath: ${self:custom.slsDeploy}.DOMAIN_BASE_PATH}
+    certificateName: ${self:custom.slsDeploy}.DOMAIN_CERTIFICATE_NAME}
+    createRoute53Record: ${self:custom.slsDeploy}.DOMAIN_CREATE_ROUTE_53_RECORD}
+    endpointType: ${self:custom.slsDeploy}.DOMAIN_ENDPOINT_TYPE}
   pythonRequirements:
     dockerizePip: non-linux
      # Do not slim the dependencies. PIL/Pillow needs the .pyc files
