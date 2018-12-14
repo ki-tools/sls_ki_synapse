@@ -29,8 +29,8 @@ Capabilities:
 - Configure environment variables:
   - Copy each file in [templates](templates) into the project's root directory and edit each file to contain the correct values.
 - Install Python Dependencies:
-  - `pip install -r requirements.txt`
   - `pip install -r requirements-dev.txt`
+  - `pip install -r requirements.txt`
 - Run specs.
   - `pytest`
 
