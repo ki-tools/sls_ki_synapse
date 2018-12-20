@@ -42,6 +42,10 @@ def graphql(event, context):
     # Build the response with the status code and GraphQL results.
     response = {
         'statusCode': status_code,
+        'headers': {
+            'Access-Control-Allow-Origin': "*",
+            'Access-Control-Allow-Credentials': 'true'
+        },
         'body': json.dumps(result)
     }
 
