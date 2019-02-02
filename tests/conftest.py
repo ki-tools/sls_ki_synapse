@@ -16,10 +16,8 @@ import pytest
 import tempfile
 import os
 import json
-import time
 from tests.synapse_test_helper import SynapseTestHelper
 from core import Synapse
-from synapseclient import EntityViewSchema, EntityViewType, Column
 
 # Load Environment variables.
 module_dir = os.path.dirname(os.path.abspath(__file__))
