@@ -163,19 +163,3 @@ class SynapseTestHelper:
         wiki = Synapse.client().store(Wiki(**kwargs))
         self.dispose_of(wiki)
         return wiki
-
-    def _empty_syn_trash(self):
-        """
-        Deletes all items in the Synapse Trash.
-        """
-        # This does not work for some reason...
-        # return Synapse.client().restPUT('/trashcan/purge')
-
-        # Page through the trash and delete each entity.
-        trash_info = Synapse.client().restGET('/trashcan/view')
-
-        while trash_info['totalNumberOfResults'] > 0:
-            for result in trash_info['results']:
-                Synapse.client().restPUT(
-                    '/trashcan/purge/{0}'.format(result['entityId']))
-            trash_info = Synapse.client().restGET('/trashcan/view')
