@@ -16,6 +16,7 @@ import pytest
 import tempfile
 import os
 import json
+import boto3
 from tests.synapse_test_helper import SynapseTestHelper
 from core import Synapse
 
@@ -53,6 +54,11 @@ def syn_test_helper():
     helper = SynapseTestHelper()
     yield helper
     helper.dispose()
+
+
+@pytest.fixture
+def s3_client():
+    return boto3.client('s3')
 
 
 @pytest.fixture

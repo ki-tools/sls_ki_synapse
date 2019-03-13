@@ -14,14 +14,15 @@
 
 import graphene
 import os
-import json
 import requests
 import tempfile
-from core import (ParamStore, Synapse)
+import boto3
+import datetime
+import uuid
+from core import ParamStore
 from core.log import logger
 from ..types import SlideDeck
 from pptx import Presentation
-from synapseclient import Project, File
 
 
 class CreateSlideDeck(graphene.Mutation):
@@ -31,8 +32,6 @@ class CreateSlideDeck(graphene.Mutation):
     slide_deck = graphene.Field(lambda: SlideDeck)
 
     class Arguments:
-        synapse_project_id = graphene.String(
-            required=True, description='The Synapse project to add the presentation to.')
         title = graphene.String(required=True)
         presenter = graphene.String(required=True)
         sprint_id = graphene.String(required=True)
@@ -51,7 +50,6 @@ class CreateSlideDeck(graphene.Mutation):
 
     def mutate(self,
                info,
-               synapse_project_id,
                title,
                presenter,
                sprint_id,
@@ -67,8 +65,6 @@ class CreateSlideDeck(graphene.Mutation):
                value,
                **kwargs):
         template_url = kwargs.get('template_url', None)
-
-        project = Synapse.client().get(Project(id=synapse_project_id))
 
         presentation = None
 
@@ -236,23 +232,33 @@ class CreateSlideDeck(graphene.Mutation):
         if rm_idx != None:
             presentation.slides._sldIdLst.remove(slides2[rm_idx])
 
-        ppt_file = os.path.join(
-            tempfile.gettempdir(),
-            'Rally_{0}_report-out.pptx'.format(sprint_id)
-        )
+        timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M%S%f")
+        ppt_file_name = 'Rally_{0}_report-out-{1}.pptx'.format(sprint_id, timestamp)
+        ppt_file_path = os.path.join(tempfile.gettempdir(), ppt_file_name)
 
-        presentation.save(ppt_file)
+        presentation.save(ppt_file_path)
 
+        # Store on S3
         try:
-            # Store the file in Synapse
-            logger.debug('Uploading file to Synapse.')
-            syn_file = Synapse.client().store(File(ppt_file, parent=project))
-            logger.debug('Finished uploading file to Synapse.')
-        finally:
-            if os.path.isfile(ppt_file):
-                os.remove(ppt_file)
+            logger.debug('Uploading SlideDeck to S3.')
 
-        new_slide_deck = SlideDeck(synapse_id=syn_file.id)
+            s3 = boto3.resource('s3')
+
+            s3.meta.client.upload_file(ppt_file_path, ParamStore.SLIDE_DECKS_BUCKET_NAME(), ppt_file_name)
+
+            logger.debug('Finished uploading SlideDeck to S3.')
+
+            # Generate a presigned URL that expires in 5 minutes.
+            presigned_url = s3.meta.client.generate_presigned_url(
+                'get_object',
+                Params={'Bucket': ParamStore.SLIDE_DECKS_BUCKET_NAME(), 'Key': ppt_file_name},
+                ExpiresIn=300
+            )
+        finally:
+            if os.path.isfile(ppt_file_path):
+                os.remove(ppt_file_path)
+
+        new_slide_deck = SlideDeck(url=presigned_url)
 
         return CreateSlideDeck(slide_deck=new_slide_deck)
 

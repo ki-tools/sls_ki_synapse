@@ -1,4 +1,4 @@
-service: 
+service:
   name: sls-ki-synapse
 
 plugins:
@@ -15,11 +15,19 @@ provider:
   environment:
     SERVICE_NAME: ${self:service}
     SERVICE_STAGE: ${self:provider.stage}
+    SLIDE_DECKS_BUCKET_NAME: ${self:custom.slideDeckBucketName}
   iamRoleStatements:
     - Effect: "Allow"
       Action:
         - "ssm:GetParameter"
-      Resource: { "Fn::Join" : ["", ["arn:aws:ssm:${self:provider.region}:", { "Ref" : "AWS::AccountId" }, ":parameter/${self:service}/${self:provider.stage}/*" ] ]  }
+      Resource: { "Fn::Join": ["", ["arn:aws:ssm:${self:provider.region}:", { "Ref": "AWS::AccountId" }, ":parameter/${self:service}/${self:provider.stage}/*" ] ]  }
+    - Effect: Allow
+      Action:
+        - s3:PutObject
+        - s3:GetObject
+        - s3:DeleteObject
+      Resource:
+        - 'arn:aws:s3:::${self:custom.slideDeckBucketName}/*'
 
 functions:
   graphql:
@@ -45,9 +53,19 @@ resources:
         ResponseType: DEFAULT_4XX
         RestApiId:
           Ref: 'ApiGatewayRestApi'
+    slideDeckBucket:
+      Type: "AWS::S3::Bucket"
+      Properties:
+        BucketName: ${self:custom.slideDeckBucketName}
+        LifecycleConfiguration:
+          Rules:
+            - Id: "Delete SlideDeck Bucket Files After One Day"
+              Status: "Enabled"
+              ExpirationInDays: 1
 
 custom:
   slsDeploy: ${file(./private.sls.deploy.json):${self:provider.stage}
+  slideDeckBucketName: "${self:service}-slide-decks-${self:provider.stage}"
   customDomain:
     enabled: ${self:custom.slsDeploy}.DOMAIN_ENABLED}
     domainName: ${self:custom.slsDeploy}.DOMAIN_NAME}
@@ -57,7 +75,7 @@ custom:
     endpointType: ${self:custom.slsDeploy}.DOMAIN_ENDPOINT_TYPE}
   pythonRequirements:
     dockerizePip: non-linux
-     # Do not slim the dependencies. PIL/Pillow needs the .pyc files
+    # Do not slim the dependencies. PIL/Pillow needs the .pyc files
     slim: false
     noDeploy:
       - pytest

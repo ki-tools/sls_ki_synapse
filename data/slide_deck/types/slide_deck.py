@@ -19,4 +19,4 @@ class SlideDeck(graphene.ObjectType):
     """
     Defines the SlideDeck type.
     """
-    synapse_id = graphene.String()
+    url = graphene.String()
