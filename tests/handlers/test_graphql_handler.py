@@ -20,6 +20,7 @@ from moto import mock_s3
 from core import (ParamStore, Synapse)
 from data.syn_project import (SynProject, SynProjectQuery)
 from data.slide_deck import (SlideDeck, CreateSlideDeck)
+import synapseclient
 
 
 def do_post(query, variables):
@@ -86,7 +87,20 @@ def test_query_syn_project(syn_test_helper):
     assert body['data']['synProject']['name'] == project.name
 
 
-def test_create_syn_project(syn_client, syn_test_helper):
+def dispose_syn_project_from_createSynProject(body, syn_test_helper):
+    if body is None:
+        return
+
+    project_id = body.get('data', {}).get('createSynProject', {}).get('synProject', {}).get('id', None)
+    if project_id:
+        syn_project = Synapse.client().get(project_id)
+        syn_test_helper.dispose_of(syn_project)
+        return syn_project
+    else:
+        return None
+
+
+def test_create_syn_project(syn_client, syn_test_helper, mocker):
     name = syn_test_helper.uniq_name(prefix='Syn Project ')
 
     admin_team = syn_test_helper.create_team()
@@ -106,6 +120,7 @@ def test_create_syn_project(syn_client, syn_test_helper):
             id
             name
           }
+          errors
         }
       }
     '''
@@ -120,12 +135,12 @@ def test_create_syn_project(syn_client, syn_test_helper):
 
     body = do_post(q, v).get('body')
     assert body.get('errors', None) is None
+    assert body['data']['createSynProject']['errors'] is None
 
     jsyn_project = body['data']['createSynProject']['synProject']
     assert jsyn_project['name'] == name
 
-    project = syn_client.get(jsyn_project['id'])
-    syn_test_helper.dispose_of(project)
+    project = dispose_syn_project_from_createSynProject(body, syn_test_helper)
 
     assert project.name == name
 
@@ -159,8 +174,88 @@ def test_create_syn_project(syn_client, syn_test_helper):
     for thread in threads['results']:
         assert thread['title'] in [p['title'] for p in posts]
 
+    ###########################################################################
+    # Permissions Errors
+    ###########################################################################
+    first_principal_id = permissions[0]['principalId']
 
-def test_update_syn_project(syn_client, syn_test_helper):
+    with mocker.mock_module.patch.object(Synapse.client(), 'setPermissions') as mock:
+
+        mock.side_effect = Exception('a foreign key constraint fails')
+        body = do_post(q, v).get('body')
+        assert dispose_syn_project_from_createSynProject(body, syn_test_helper)
+        assert body.get('errors', None) is None
+        jerrors = body['data']['createSynProject']['errors']
+        assert jerrors
+        assert 'User or Team ID: {0} does not exist.'.format(first_principal_id) in jerrors
+
+        mock.side_effect = Exception('some random error')
+        body = do_post(q, v).get('body')
+        assert dispose_syn_project_from_createSynProject(body, syn_test_helper)
+        assert body.get('errors', None) is None
+        jerrors = body['data']['createSynProject']['errors']
+        assert jerrors
+        assert 'Error setting permission for User or Team ID: {0}'.format(first_principal_id) in jerrors
+
+    ###########################################################################
+    # Folders and Wiki Errors
+    ###########################################################################
+    _real_store = Synapse.client().store
+
+    def _store_proxy(obj, **kwargs):
+        if isinstance(obj, synapseclient.Folder) or isinstance(obj, synapseclient.Wiki):
+            raise Exception('some random error')
+        return _real_store(obj, **kwargs)
+
+    with mocker.mock_module.patch.object(Synapse.client(), 'store', new=_store_proxy):
+        body = do_post(q, v).get('body')
+        assert dispose_syn_project_from_createSynProject(body, syn_test_helper)
+        assert body.get('errors', None) is None
+        jerrors = body['data']['createSynProject']['errors']
+        assert jerrors
+
+        for folder in folders:
+            assert 'Error creating project folder: {0}.'.format(folder) in jerrors
+
+        assert 'Error creating project wiki.' in jerrors
+
+    ###########################################################################
+    # Posts Errors
+    ###########################################################################
+    _real_restGET = Synapse.client().restGET
+
+    def _restGET_proxy(uri, endpoint=None, headers=None, retryPolicy={}, **kwargs):
+        if '/forum' in uri:
+            raise Exception('some random error')
+        return _real_restGET(uri, endpoint=endpoint, headers=headers, retryPolicy=retryPolicy, **kwargs)
+
+    with mocker.mock_module.patch.object(Synapse.client(), 'restGET', new=_restGET_proxy):
+        body = do_post(q, v).get('body')
+        assert dispose_syn_project_from_createSynProject(body, syn_test_helper)
+        assert body.get('errors', None) is None
+        jerrors = body['data']['createSynProject']['errors']
+        assert jerrors
+        assert 'Error creating projects posts.' in jerrors
+
+    _real_restPOST = Synapse.client().restPOST
+
+    def _restPOST_proxy(uri, body, endpoint=None, headers=None, retryPolicy={}, **kwargs):
+        if '/thread' in uri:
+            raise Exception('some random error')
+        return _real_restPOST(uri, body, endpoint=endpoint, headers=headers, retryPolicy=retryPolicy,
+                              **kwargs)
+
+    with mocker.mock_module.patch.object(Synapse.client(), 'restPOST', new=_restPOST_proxy):
+        body = do_post(q, v).get('body')
+        assert dispose_syn_project_from_createSynProject(body, syn_test_helper)
+        assert body.get('errors', None) is None
+        jerrors = body['data']['createSynProject']['errors']
+        assert jerrors
+        for post in posts:
+            assert 'Error creating project post: {0}.'.format(post.get('title')) in jerrors
+
+
+def test_update_syn_project(syn_client, syn_test_helper, mocker):
     project = syn_test_helper.create_project()
     team = syn_test_helper.create_team()
 
@@ -182,6 +277,7 @@ def test_update_syn_project(syn_client, syn_test_helper):
             id
             name
           }
+          errors
         }
       }
     '''
@@ -221,6 +317,35 @@ def test_update_syn_project(syn_client, syn_test_helper):
                              for r in acl['resourceAccess']]
 
     assert int(removed_perm['principalId']) not in current_principal_ids
+
+    ###########################################################################
+    # Permissions Errors
+    ###########################################################################
+    first_principal_id = permissions[0]['principalId']
+
+    with mocker.mock_module.patch.object(Synapse.client(), 'setPermissions') as mock:
+
+        project = syn_test_helper.create_project()
+        v['id'] = project.id
+        v['name'] = syn_test_helper.uniq_name(prefix='New Project Name ')
+        mock.side_effect = Exception('a foreign key constraint fails')
+        body = do_post(q, v).get('body')
+        assert body.get('errors', None) is None
+        assert body['data']['updateSynProject']['synProject']['id']
+        jerrors = body['data']['updateSynProject']['errors']
+        assert jerrors
+        assert 'User or Team ID: {0} does not exist.'.format(first_principal_id) in jerrors
+
+        project = syn_test_helper.create_project()
+        v['id'] = project.id
+        v['name'] = syn_test_helper.uniq_name(prefix='New Project Name ')
+        mock.side_effect = Exception('some random error')
+        body = do_post(q, v).get('body')
+        assert body.get('errors', None) is None
+        assert body['data']['updateSynProject']['synProject']['id']
+        jerrors = body['data']['updateSynProject']['errors']
+        assert jerrors
+        assert 'Error setting permission for User or Team ID: {0}'.format(first_principal_id) in jerrors
 
 
 ###################################################################################################
