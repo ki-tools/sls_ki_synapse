@@ -1,5 +1,5 @@
 {
-    "query": "mutation CreateSynProject($name: String!, $permissions: [PermissionDataInput], $annotations: [AnnotationDataInput], $wiki: WikiDataInput, $folders: [String], $posts: [PostDataInput]) { createSynProject(name: $name, permissions: $permissions, annotations: $annotations, wiki: $wiki, folders: $folders, posts: $posts) { synProject { id name } } }",
+    "query": "mutation CreateSynProject($name: String!, $permissions: [PermissionDataInput], $annotations: [AnnotationDataInput], $wiki: WikiDataInput, $folders: [String], $posts: [PostDataInput]) { createSynProject(name: $name, permissions: $permissions, annotations: $annotations, wiki: $wiki, folders: $folders, posts: $posts) { synProject { id name } errors } }",
     "variables": {
         "name": "A Test SynProject",
         "permissions": [{
