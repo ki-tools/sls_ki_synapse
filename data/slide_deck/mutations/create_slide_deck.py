@@ -248,11 +248,11 @@ class CreateSlideDeck(graphene.Mutation):
 
             logger.debug('Finished uploading SlideDeck to S3.')
 
-            # Generate a presigned URL that expires in 5 minutes.
+            # Generate a presigned URL that expires.
             presigned_url = s3.meta.client.generate_presigned_url(
                 'get_object',
                 Params={'Bucket': ParamStore.SLIDE_DECKS_BUCKET_NAME(), 'Key': ppt_file_name},
-                ExpiresIn=300
+                ExpiresIn=ParamStore.SLIDE_DECKS_URL_EXPIRES_IN_SECONDS()
             )
         finally:
             if os.path.isfile(ppt_file_path):

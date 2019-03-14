@@ -29,12 +29,6 @@ if os.path.isfile(test_env_file):
     with open(test_env_file) as f:
         config = json.load(f).get('test')
 
-        # Validate required properties are present
-        for prop in ['SYNAPSE_USERNAME', 'SYNAPSE_PASSWORD']:
-            if not prop in config or not config[prop]:
-                raise Exception(
-                    'Property: "{0}" is missing in {1}'.format(prop, test_env_file))
-
         for key, value in config.items():
             os.environ[key] = value
 else:
@@ -56,7 +50,7 @@ def syn_test_helper():
     helper.dispose()
 
 
-@pytest.fixture
+@pytest.fixture(scope='session')
 def s3_client():
     return boto3.client('s3')
 

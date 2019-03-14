@@ -69,7 +69,7 @@ class UpdateSynProject(graphene.Mutation):
                 if current_principal_id == int(project.createdBy):
                     continue
                     
-                if not current_principal_id in new_principal_ids:
+                if current_principal_id not in new_principal_ids:
                     Synapse.client().setPermissions(project, current_principal_id,
                                                     accessType=None, warn_if_inherits=False)
 

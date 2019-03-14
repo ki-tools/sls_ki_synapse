@@ -60,7 +60,7 @@ def test_handler_get_syn_project(mocker):
     mock.return_value = SynProject(id=expected_syn_id)
 
     body = do_post(q, v).get('body')
-    assert not body.get('errors', None)
+    assert body.get('errors', None) is None
     assert body['data']['synProject']['id'] == expected_syn_id
 
 
@@ -80,8 +80,8 @@ def test_query_syn_project(syn_test_helper):
     }
 
     body = do_post(q, v).get('body')
-    assert not body.get('errors', None)
-    assert body['data']['synProject'] != None
+    assert body.get('errors', None) is None
+    assert body['data']['synProject'] is not None
     assert body['data']['synProject']['id'] == project.id
     assert body['data']['synProject']['name'] == project.name
 
@@ -119,7 +119,7 @@ def test_create_syn_project(syn_client, syn_test_helper):
     }
 
     body = do_post(q, v).get('body')
-    assert not body.get('errors', None)
+    assert body.get('errors', None) is None
 
     jsyn_project = body['data']['createSynProject']['synProject']
     assert jsyn_project['name'] == name
@@ -192,7 +192,7 @@ def test_update_syn_project(syn_client, syn_test_helper):
     }
 
     body = do_post(q, v).get('body')
-    assert not body.get('errors', None)
+    assert body.get('errors', None) is None
     jsyn_project = body['data']['updateSynProject']['synProject']
     assert jsyn_project['name'] == name
 
@@ -213,7 +213,7 @@ def test_update_syn_project(syn_client, syn_test_helper):
     removed_perm = permissions.pop()
 
     body = do_post(q, v).get('body')
-    assert not body.get('errors', None)
+    assert body.get('errors', None) is None
 
     acl = Synapse.client()._getACL(project)
 
@@ -262,7 +262,7 @@ def test_handler_create_slide_deck(mocker):
     # mock.return_value = SlideDeck(url=expected_url)
     #
     # body = do_post(q, v).get('body')
-    # assert not body.get('errors', None)
+    # assert body.get('errors', None) is None
     # jslide_deck = body['data']['createSlideDeck']['slideDeck']
     # assert jslide_deck['url'] == expected_url
 
@@ -299,9 +299,9 @@ def test_create_slide_deck(s3_client):
     }
 
     body = do_post(q, v).get('body')
-    assert not body.get('errors', None)
+    assert body.get('errors', None) is None
     jslide_deck = body['data']['createSlideDeck']['slideDeck']
-    assert jslide_deck['url'] != None
+    assert jslide_deck['url'] is not None
     assert ParamStore.SLIDE_DECKS_BUCKET_NAME() in jslide_deck['url']
 
     # Uses the template_url
@@ -314,6 +314,6 @@ def test_create_slide_deck(s3_client):
     responses.add(responses.GET, template_url, body=pptx, status=200)
 
     body = do_post(q, v).get('body')
-    assert not body.get('errors', None)
-    assert jslide_deck['url'] != None
+    assert body.get('errors', None) is None
+    assert jslide_deck['url'] is not None
     assert ParamStore.SLIDE_DECKS_BUCKET_NAME() in jslide_deck['url']

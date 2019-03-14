@@ -59,9 +59,9 @@ resources:
         BucketName: ${self:custom.slideDeckBucketName}
         LifecycleConfiguration:
           Rules:
-            - Id: "Delete SlideDeck Bucket Files After One Day"
+            - Id: "Delete SlideDeck Bucket Files"
               Status: "Enabled"
-              ExpirationInDays: 1
+              ExpirationInDays: ${self:custom.slsDeploy}.SLIDE_DECKS_BUCKET_EXPIRATION_IN_DAYS}
 
 custom:
   slsDeploy: ${file(./private.sls.deploy.json):${self:provider.stage}
