@@ -56,7 +56,6 @@ def mk_gql_variables(syn_test_helper):
 
 
 @mock_s3
-@responses.activate
 def test_it_creates_a_slide_deck_from_the_internal_template(do_gql_post, gql_query, mk_gql_variables, s3_client):
     # Create a mock bucket to store the ppt file.
     s3_client.create_bucket(Bucket=ParamStore.SLIDE_DECKS_BUCKET_NAME())

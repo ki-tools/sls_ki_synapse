@@ -13,7 +13,8 @@
 # limitations under the License.
 
 import pytest
-from core import Synapse, ParamStore
+import os
+from core import Synapse
 import synapseclient
 
 
@@ -63,7 +64,7 @@ def mk_gql_variables(syn_test_helper):
             syn_team = syn_test_helper.create_team()
             vars['permissions'] = [{"principalId": str(syn_team.id), "access": "ADMIN"}]
 
-            other_test_user_id = ParamStore._get_from_os('SYNAPSE_OTHER_USER_ID')
+            other_test_user_id = os.environ.get('SYNAPSE_OTHER_USER_ID', None)
             if other_test_user_id:
                 vars['permissions'].append({"principalId": int(other_test_user_id), "access": "CAN_EDIT"})
             else:
