@@ -11,14 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 import pytest
 import tempfile
 import os
 import json
 import boto3
-from tests.synapse_test_helper import SynapseTestHelper
-from core import Synapse
 
 # Load Environment variables.
 module_dir = os.path.dirname(os.path.abspath(__file__))
@@ -33,6 +30,11 @@ if os.path.isfile(test_env_file):
             os.environ[key] = value
 else:
     print('WARNING: Test environment file not found at: {0}'.format(test_env_file))
+
+# Import the remaining modules after the ENV variables have been loaded and set.
+from tests.synapse_test_helper import SynapseTestHelper
+from handlers import graphql_handler
+from core import Synapse
 
 
 @pytest.fixture(scope='session')
@@ -67,3 +69,22 @@ def temp_file(syn_test_helper):
 
     if os.path.isfile(tmp_filename):
         os.remove(tmp_filename)
+
+
+@pytest.fixture(scope='session')
+def do_gql_post():
+    """
+    Executes a query against the handler.
+    """
+
+    def _do_gql_post(query, variables):
+        event = {'body': json.dumps({'query': query, 'variables': variables})}
+        context = None
+        response = graphql_handler.graphql(event, context)
+
+        # Convert the body to a dict so testing is easier.
+        response['body'] = json.loads(response['body'])
+
+        return response
+
+    yield _do_gql_post

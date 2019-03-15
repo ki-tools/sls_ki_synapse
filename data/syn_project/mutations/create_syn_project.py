@@ -39,16 +39,20 @@ class CreateSynProject(graphene.Mutation):
         folders = graphene.List(graphene.String)
         posts = graphene.List(PostDataInput)
 
-    def mutate(self,
-               info,
-               name,
-               permissions,
-               annotations,
-               wiki,
-               folders,
-               posts):
-
+    def mutate(self, info, name, **kwargs):
         errors = []
+
+        permissions = kwargs.get('permissions', None)
+        annotations = kwargs.get('annotations', None)
+        wiki = kwargs.get('wiki', None)
+        folders = kwargs.get('folders', None)
+        posts = kwargs.get('posts', None)
+
+        # Check if a project with the same name already exists.
+        project_name_taken = Synapse.client().findEntityId(name) is not None
+
+        if project_name_taken:
+            raise ValueError('Another Synapse project with the name: {0} already exists.'.format(name))
 
         # Build the annotations
         project_annotations = {}
