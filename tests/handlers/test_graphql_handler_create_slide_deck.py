@@ -70,7 +70,6 @@ def test_it_creates_a_slide_deck_from_the_internal_template(do_gql_post, gql_que
 
 
 @mock_s3
-@responses.activate
 def test_it_creates_a_slide_deck_from_an_external_template(do_gql_post, gql_query, mk_gql_variables, s3_client):
     # Create a mock bucket to store the ppt file.
     s3_client.create_bucket(Bucket=ParamStore.SLIDE_DECKS_BUCKET_NAME())
@@ -82,12 +81,11 @@ def test_it_creates_a_slide_deck_from_an_external_template(do_gql_post, gql_quer
     with open('assets/template_ki_empty.pptx', 'rb') as f:
         pptx = f.read()
 
-    responses.add(responses.GET, template_url, body=pptx, status=200)
+    with responses.RequestsMock() as rsps:
+        rsps.add(responses.GET, template_url, body=pptx, status=200)
 
-    body = do_gql_post(gql_query, gql_variables).get('body')
-    assert body.get('errors', None) is None
-    jslide_deck = body['data']['createSlideDeck']['slideDeck']
-    assert jslide_deck['url'] is not None
-    assert ParamStore.SLIDE_DECKS_BUCKET_NAME() in jslide_deck['url']
-
-    assert responses.calls[0].request.url == template_url
+        body = do_gql_post(gql_query, gql_variables).get('body')
+        assert body.get('errors', None) is None
+        jslide_deck = body['data']['createSlideDeck']['slideDeck']
+        assert jslide_deck['url'] is not None
+        assert ParamStore.SLIDE_DECKS_BUCKET_NAME() in jslide_deck['url']
