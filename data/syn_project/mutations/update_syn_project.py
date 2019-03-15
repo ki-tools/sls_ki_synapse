@@ -31,21 +31,21 @@ class UpdateSynProject(graphene.Mutation):
         name = graphene.String()
         permissions = graphene.List(PermissionDataInput)
 
-    def mutate(self,
-               info,
-               id,
-               name,
-               permissions):
-
+    def mutate(self, info, id, **kwargs):
         errors = []
 
-        # Create the Project
+        name = kwargs.get('name', None)
+        permissions = kwargs.get('permissions', None)
+
+        # Get the Project
         project = Synapse.client().get(id)
 
         if name:
             project.name = name
 
-        if permissions:
+        # An empty list mean remove all permissions.
+        # A null list means don't remove any permissions.
+        if permissions is not None:
             for permission in permissions:
                 try:
                     principal_id = permission['principal_id']
