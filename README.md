@@ -1,7 +1,7 @@
 # SLS KI Synapse
 
-[![Build Status](https://travis-ci.com/pcstout/sls_ki_synapse.svg?branch=master)](https://travis-ci.com/pcstout/sls_ki_synapse)
-[![Coverage Status](https://coveralls.io/repos/github/pcstout/sls_ki_synapse/badge.svg?branch=master)](https://coveralls.io/github/pcstout/sls_ki_synapse?branch=master)
+[![Build Status](https://travis-ci.org/ki-tools/sls_ki_synapse.svg?branch=master)](https://travis-ci.org/ki-tools/sls_ki_synapse)
+[![Coverage Status](https://coveralls.io/repos/github/ki-tools/sls_ki_synapse/badge.svg?branch=master)](https://coveralls.io/github/ki-tools/sls_ki_synapse?branch=master)
 
 ## Overview
 
