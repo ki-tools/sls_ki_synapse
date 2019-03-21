@@ -138,21 +138,21 @@ class CreateSlideDeck(graphene.Mutation):
 
         # problem statement
 
-        slide = presentation.slides.add_slide(plain_layout)
-        title_shape = CreateSlideDeck.get_placeholder(slide, 'Title 2')
-        body_shape = CreateSlideDeck.get_placeholder(slide, 'Text Placeholder 1')
-        title_shape.text = "Problem Statement"
-        body_shape.text = problem_statement
-        CreateSlideDeck.add_notes(slide)
+        # slide = presentation.slides.add_slide(plain_layout)
+        # title_shape = CreateSlideDeck.get_placeholder(slide, 'Title 2')
+        # body_shape = CreateSlideDeck.get_placeholder(slide, 'Text Placeholder 1')
+        # title_shape.text = "Problem Statement"
+        # body_shape.text = problem_statement
+        # CreateSlideDeck.add_notes(slide)
 
-        CreateSlideDeck.move_to_front(presentation)
+        # CreateSlideDeck.move_to_front(presentation)
 
         # motivation
 
         slide = presentation.slides.add_slide(plain_layout)
         title_shape = CreateSlideDeck.get_placeholder(slide, 'Title 2')
         body_shape = CreateSlideDeck.get_placeholder(slide, 'Text Placeholder 1')
-        title_shape.text = "Motivation"
+        title_shape.text = "Value Hypothesis"
         body_shape.text = motivation
         CreateSlideDeck.add_notes(slide)
 
