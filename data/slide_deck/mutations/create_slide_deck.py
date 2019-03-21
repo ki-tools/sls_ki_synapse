@@ -14,14 +14,16 @@
 
 import graphene
 import os
-import json
 import requests
 import tempfile
-from core import (ParamStore, Synapse)
+import boto3
+import datetime
+import uuid
+from core import ParamStore
 from core.log import logger
 from ..types import SlideDeck
 from pptx import Presentation
-from synapseclient import Project, File
+
 
 class CreateSlideDeck(graphene.Mutation):
     """
@@ -30,8 +32,6 @@ class CreateSlideDeck(graphene.Mutation):
     slide_deck = graphene.Field(lambda: SlideDeck)
 
     class Arguments:
-        synapse_project_id = graphene.String(
-            required=True, description='The Synapse project to add the presentation to.')
         title = graphene.String(required=True)
         presenter = graphene.String(required=True)
         sprint_id = graphene.String(required=True)
@@ -50,7 +50,6 @@ class CreateSlideDeck(graphene.Mutation):
 
     def mutate(self,
                info,
-               synapse_project_id,
                title,
                presenter,
                sprint_id,
@@ -67,8 +66,6 @@ class CreateSlideDeck(graphene.Mutation):
                **kwargs):
         template_url = kwargs.get('template_url', None)
 
-        project = Synapse.client().get(Project(id=synapse_project_id))
-
         presentation = None
 
         if template_url and template_url != '':
@@ -78,7 +75,7 @@ class CreateSlideDeck(graphene.Mutation):
 
             if r.status_code == 200:
                 fd, tmp_filename = tempfile.mkstemp(suffix='.pptx')
-                
+
                 try:
                     with os.fdopen(fd, 'wb') as tmp:
                         tmp.write(r.content)
@@ -104,34 +101,22 @@ class CreateSlideDeck(graphene.Mutation):
         plain_layout = presentation.slide_layouts.get_by_name(SLD_HEAD_COPY)
         bullet_layout = presentation.slide_layouts.get_by_name(SLD_HEAD_BULLETS)
 
-        if title_layout == None or plain_layout == None or bullet_layout == None:
+        if title_layout is None or plain_layout is None or bullet_layout is None:
             raise Exception('Slide deck provided is not using the correct template')
-
-        def get_placeholder(slide, name):
-            for shape in slide.placeholders:
-                if shape.name == name:
-                    return shape
-            raise Exception('Slide deck provided is not using the correct template')
-
-        def add_notes(slide):
-            # slide.has_notes_slide
-            notes_slide = slide.notes_slide
-            text_frame = notes_slide.notes_text_frame
-            text_frame.text = 'DO NOT EDIT THIS SLIDE!!! INSTEAD, EDIT THE RALLY METADATA ON http://hub.kiglobalhealth.org.'
 
         # deliverables
 
         slide = presentation.slides.add_slide(bullet_layout)
         shapes = slide.shapes
         title_shape = shapes.title
-        body_shape = get_placeholder(slide, 'Text Placeholder 1')
+        body_shape = CreateSlideDeck.get_placeholder(slide, 'Text Placeholder 1')
         title_shape.text = 'Deliverables'
         tf = body_shape.text_frame
         for item in deliverables:
             p = tf.add_paragraph()
             p.text = item
             p.level = 1
-        add_notes(slide)
+        CreateSlideDeck.add_notes(slide)
 
         CreateSlideDeck.move_to_front(presentation)
 
@@ -140,61 +125,61 @@ class CreateSlideDeck(graphene.Mutation):
         slide = presentation.slides.add_slide(bullet_layout)
         shapes = slide.shapes
         title_shape = shapes.title
-        body_shape = get_placeholder(slide, 'Text Placeholder 1')
+        body_shape = CreateSlideDeck.get_placeholder(slide, 'Text Placeholder 1')
         title_shape.text = 'Sprint Questions'
         tf = body_shape.text_frame
         for item in sprint_questions:
             p = tf.add_paragraph()
             p.text = item
             p.level = 1
-        add_notes(slide)
+        CreateSlideDeck.add_notes(slide)
 
         CreateSlideDeck.move_to_front(presentation)
 
         # problem statement
 
         slide = presentation.slides.add_slide(plain_layout)
-        title_shape = get_placeholder(slide, 'Title 2')
-        body_shape = get_placeholder(slide, 'Text Placeholder 1')
+        title_shape = CreateSlideDeck.get_placeholder(slide, 'Title 2')
+        body_shape = CreateSlideDeck.get_placeholder(slide, 'Text Placeholder 1')
         title_shape.text = "Problem Statement"
         body_shape.text = problem_statement
-        add_notes(slide)
+        CreateSlideDeck.add_notes(slide)
 
         CreateSlideDeck.move_to_front(presentation)
 
         # motivation
 
         slide = presentation.slides.add_slide(plain_layout)
-        title_shape = get_placeholder(slide, 'Title 2')
-        body_shape = get_placeholder(slide, 'Text Placeholder 1')
+        title_shape = CreateSlideDeck.get_placeholder(slide, 'Title 2')
+        body_shape = CreateSlideDeck.get_placeholder(slide, 'Text Placeholder 1')
         title_shape.text = "Motivation"
         body_shape.text = motivation
-        add_notes(slide)
+        CreateSlideDeck.add_notes(slide)
 
         CreateSlideDeck.move_to_front(presentation)
 
         # background
 
         slide = presentation.slides.add_slide(plain_layout)
-        title_shape = get_placeholder(slide, 'Title 2')
-        body_shape = get_placeholder(slide, 'Text Placeholder 1')
+        title_shape = CreateSlideDeck.get_placeholder(slide, 'Title 2')
+        body_shape = CreateSlideDeck.get_placeholder(slide, 'Text Placeholder 1')
         title_shape.text = "Background"
         body_shape.text = background
-        add_notes(slide)
+        CreateSlideDeck.add_notes(slide)
 
         CreateSlideDeck.move_to_front(presentation)
 
         # title slide
 
         slide = presentation.slides.add_slide(title_layout)
-        title_shape = get_placeholder(slide, 'Title 1')
-        body_shape1 = get_placeholder(slide, 'Text Placeholder 2')
-        body_shape2 = get_placeholder(slide, 'Text Placeholder 3')
+        title_shape = CreateSlideDeck.get_placeholder(slide, 'Title 1')
+        body_shape1 = CreateSlideDeck.get_placeholder(slide, 'Text Placeholder 2')
+        body_shape2 = CreateSlideDeck.get_placeholder(slide, 'Text Placeholder 3')
         title_shape.text = 'Rally {0}: {1}'.format(sprint_id, title)
         body_shape1.text = 'Completed {0}'.format(end_date)
         body_shape2.text = 'Presented by {0} on behalf of rally participants {1}'.format(
             presenter, ', '.join(participants))
-        add_notes(slide)
+        CreateSlideDeck.add_notes(slide)
 
         CreateSlideDeck.move_to_front(presentation)
 
@@ -205,30 +190,30 @@ class CreateSlideDeck(graphene.Mutation):
         slide = presentation.slides.add_slide(bullet_layout)
         shapes = slide.shapes
         title_shape = shapes.title
-        body_shape = get_placeholder(slide, 'Text Placeholder 1')
+        body_shape = CreateSlideDeck.get_placeholder(slide, 'Text Placeholder 1')
         title_shape.text = 'Key Findings'
         tf = body_shape.text_frame
         for item in key_findings:
             p = tf.add_paragraph()
             p.text = item
             p.level = 1
-        add_notes(slide)
+        CreateSlideDeck.add_notes(slide)
 
         # value
 
         slide = presentation.slides.add_slide(plain_layout)
-        title_shape = get_placeholder(slide, 'Title 2')
-        body_shape = get_placeholder(slide, 'Text Placeholder 1')
+        title_shape = CreateSlideDeck.get_placeholder(slide, 'Title 2')
+        body_shape = CreateSlideDeck.get_placeholder(slide, 'Text Placeholder 1')
         title_shape.text = "Value"
         body_shape.text = value
-        add_notes(slide)
+        CreateSlideDeck.add_notes(slide)
 
         # next steps
 
         slide = presentation.slides.add_slide(bullet_layout)
         shapes = slide.shapes
         title_shape = shapes.title
-        body_shape = get_placeholder(slide, 'Text Placeholder 1')
+        body_shape = CreateSlideDeck.get_placeholder(slide, 'Text Placeholder 1')
         title_shape.text = 'Next Steps'
         tf = body_shape.text_frame
         items = next_steps
@@ -236,36 +221,44 @@ class CreateSlideDeck(graphene.Mutation):
             p = tf.add_paragraph()
             p.text = item
             p.level = 1
-        add_notes(slide)
+        CreateSlideDeck.add_notes(slide)
 
         # remove INSTRUCTIONS slide before saving
 
         slides = list(presentation.slides)
         slides2 = list(presentation.slides._sldIdLst)
         rm_idx = next((i for i in range(len(slides))
-                        if slides[i].slide_layout.name == SLD_INSTRUCTIONS), None)
+                       if slides[i].slide_layout.name == SLD_INSTRUCTIONS), None)
         if rm_idx != None:
             presentation.slides._sldIdLst.remove(slides2[rm_idx])
 
-        ppt_file = os.path.join(
-            tempfile.gettempdir(),
-            'Rally_{0}_report-out.pptx'.format(sprint_id)
-        )
+        timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M%S%f")
+        ppt_file_name = 'Rally_{0}_report-out-{1}.pptx'.format(sprint_id, timestamp)
+        ppt_file_path = os.path.join(tempfile.gettempdir(), ppt_file_name)
 
-        presentation.save(ppt_file)
+        presentation.save(ppt_file_path)
 
-        presentation.save(ppt_file)
-
+        # Store on S3
         try:
-            # Store the file in Synapse
-            logger.debug('Uploading file to Synapse.')
-            syn_file = Synapse.client().store(File(ppt_file, parent=project))
-            logger.debug('Finished uploading file to Synapse.')
-        finally:
-            if os.path.isfile(ppt_file):
-                os.remove(ppt_file)
+            logger.debug('Uploading SlideDeck to S3.')
 
-        new_slide_deck = SlideDeck(synapse_id=syn_file.id)
+            s3 = boto3.resource('s3')
+
+            s3.meta.client.upload_file(ppt_file_path, ParamStore.SLIDE_DECKS_BUCKET_NAME(), ppt_file_name)
+
+            logger.debug('Finished uploading SlideDeck to S3.')
+
+            # Generate a presigned URL that expires.
+            presigned_url = s3.meta.client.generate_presigned_url(
+                'get_object',
+                Params={'Bucket': ParamStore.SLIDE_DECKS_BUCKET_NAME(), 'Key': ppt_file_name},
+                ExpiresIn=ParamStore.SLIDE_DECKS_URL_EXPIRES_IN_SECONDS()
+            )
+        finally:
+            if os.path.isfile(ppt_file_path):
+                os.remove(ppt_file_path)
+
+        new_slide_deck = SlideDeck(url=presigned_url)
 
         return CreateSlideDeck(slide_deck=new_slide_deck)
 
@@ -275,3 +268,16 @@ class CreateSlideDeck(graphene.Mutation):
         slides = list(presentation.slides._sldIdLst)
         presentation.slides._sldIdLst.remove(slides[last_slide])
         presentation.slides._sldIdLst.insert(0, slides[last_slide])
+
+    @staticmethod
+    def get_placeholder(slide, name):
+        for shape in slide.placeholders:
+            if shape.name == name:
+                return shape
+        raise Exception('Invalid slide deck template. Cannot find shape with name: {0}'.format(name))
+
+    @staticmethod
+    def add_notes(slide):
+        notes_slide = slide.notes_slide
+        text_frame = notes_slide.notes_text_frame
+        text_frame.text = 'DO NOT EDIT THIS SLIDE!!! INSTEAD, EDIT THE RALLY METADATA ON http://hub.kiglobalhealth.org.'

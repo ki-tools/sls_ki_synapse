@@ -54,8 +54,7 @@ class ParamStore:
         result = None
 
         try:
-            get_response = client.get_parameter(
-                Name=ssm_key, WithDecryption=True)
+            get_response = client.get_parameter(Name=ssm_key, WithDecryption=True)
             result = get_response.get('Parameter').get('Value')
         except client.exceptions.ParameterNotFound:
             logging.exception('SSM Parameter Not Found: {}'.format(ssm_key))
@@ -76,8 +75,8 @@ class ParamStore:
         """
         Builds a SSM key in the format for service_name/service_stage/key.
         """
-        service_name = os.environ.get('SERVICE_NAME')
-        service_stage = os.environ.get('SERVICE_STAGE')
+        service_name = cls._get_from_os('SERVICE_NAME')
+        service_stage = cls._get_from_os('SERVICE_STAGE')
 
         return '/{0}/{1}/{2}'.format(service_name, service_stage, key)
 
@@ -120,3 +119,11 @@ class ParamStore:
         String of comma separated keys that are used for API access.
         """
         return cls.get('JWT_API_KEYS', default)
+
+    @classmethod
+    def SLIDE_DECKS_BUCKET_NAME(cls, default=None):
+        return cls.get('SLIDE_DECKS_BUCKET_NAME', default)
+
+    @classmethod
+    def SLIDE_DECKS_URL_EXPIRES_IN_SECONDS(cls, default=300):
+        return int(cls.get('SLIDE_DECKS_URL_EXPIRES_IN_SECONDS', default))

@@ -114,7 +114,7 @@ class SynapseTestHelper:
         """
         Creates a new Project and adds it to the trash queue.
         """
-        if not 'name' in kwargs:
+        if 'name' not in kwargs:
             kwargs['name'] = self.uniq_name(prefix=kwargs.get('prefix', ''))
 
         kwargs.pop('prefix', None)
@@ -127,7 +127,7 @@ class SynapseTestHelper:
         """
         Creates a new File and adds it to the trash queue.
         """
-        if not 'name' in kwargs:
+        if 'name' not in kwargs:
             kwargs['name'] = self.uniq_name(prefix=kwargs.get('prefix', ''))
 
         kwargs.pop('prefix', None)
@@ -140,7 +140,7 @@ class SynapseTestHelper:
         """
         Creates a new Team and adds it to the trash queue.
         """
-        if not 'name' in kwargs:
+        if 'name' not in kwargs:
             kwargs['name'] = self.uniq_name(prefix=kwargs.get('prefix', ''))
 
         kwargs.pop('prefix', None)
@@ -153,11 +153,11 @@ class SynapseTestHelper:
         """
         Creates a new Wiki and adds it to the trash queue.
         """
-        if not 'title' in kwargs:
+        if 'title' not in kwargs:
             kwargs['title'] = self.uniq_name(prefix=kwargs.get('prefix', ''))
         kwargs.pop('prefix', None)
 
-        if not 'markdown' in kwargs:
+        if 'markdown' not in kwargs:
             kwargs['markdown'] = 'My Wiki {0}'.format(kwargs['title'])
 
         wiki = Synapse.client().store(Wiki(**kwargs))

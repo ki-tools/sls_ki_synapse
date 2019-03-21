@@ -8,7 +8,8 @@
         "DOMAIN_BASE_PATH": "",
         "DOMAIN_CERTIFICATE_NAME": "*.mydomain.com",
         "DOMAIN_CREATE_ROUTE_53_RECORD": true,
-        "DOMAIN_ENDPOINT_TYPE": "regional"
+        "DOMAIN_ENDPOINT_TYPE": "regional",
+        "SLIDE_DECKS_BUCKET_EXPIRATION_IN_DAYS": 1
     },
     "staging": {
         "AWS_PROFILE": "dev",
@@ -18,7 +19,8 @@
         "DOMAIN_BASE_PATH": "",
         "DOMAIN_CERTIFICATE_NAME": "*.mydomain.com",
         "DOMAIN_CREATE_ROUTE_53_RECORD": true,
-        "DOMAIN_ENDPOINT_TYPE": "regional"
+        "DOMAIN_ENDPOINT_TYPE": "regional",
+        "SLIDE_DECKS_BUCKET_EXPIRATION_IN_DAYS": 1
     },
     "dev": {
         "AWS_PROFILE": "dev",
@@ -28,7 +30,8 @@
         "DOMAIN_BASE_PATH": "",
         "DOMAIN_CERTIFICATE_NAME": "*.mydomain.com",
         "DOMAIN_CREATE_ROUTE_53_RECORD": true,
-        "DOMAIN_ENDPOINT_TYPE": "regional"
+        "DOMAIN_ENDPOINT_TYPE": "regional",
+        "SLIDE_DECKS_BUCKET_EXPIRATION_IN_DAYS": 1
     },
     "test": {
         "AWS_PROFILE": "dev",
@@ -38,6 +41,7 @@
         "DOMAIN_BASE_PATH": "",
         "DOMAIN_CERTIFICATE_NAME": "*.mydomain.com",
         "DOMAIN_CREATE_ROUTE_53_RECORD": true,
-        "DOMAIN_ENDPOINT_TYPE": "regional"
+        "DOMAIN_ENDPOINT_TYPE": "regional",
+        "SLIDE_DECKS_BUCKET_EXPIRATION_IN_DAYS": 1
     }
 }
