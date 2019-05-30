@@ -77,7 +77,7 @@ def mk_gql_variables(syn_test_helper):
             vars['wiki'] = {'title': 'Main Wiki', 'markdown': 'main wiki markdown'}
 
         if with_all or with_folders:
-            vars['folders'] = ['Folder1', 'Folder2']
+            vars['folders'] = ['Folder1', 'Folder2', 'RootFolder/SubFolder1/SubFolder2']
 
         if with_all or with_posts:
             vars['posts'] = [{"title": "test1", "messageMarkdown": "markdown1"},
@@ -172,9 +172,14 @@ def test_it_creates_folders(do_gql_post, gql_query, mk_gql_variables, syn_test_h
 
     project = dispose_syn_project_from_body(body, syn_test_helper)
 
-    project_folders = syn_client.getChildren(project, includeTypes=['folder'])
-    for project_folder in project_folders:
-        assert project_folder['name'] in folders
+    for folder_path in folders:
+        parent = project
+        for folder_part in list(filter(None, folder_path.split('/'))):
+            syn_folders = list(syn_client.getChildren(parent, includeTypes=['folder']))
+            syn_folder = next((f for f in syn_folders if f.get('name') == folder_part), None)
+            assert syn_folder
+            assert syn_folder.get('name') == folder_part
+            parent = syn_folder
 
 
 def test_it_creates_posts(do_gql_post, gql_query, mk_gql_variables, syn_test_helper, syn_client):
@@ -269,8 +274,9 @@ def test_it_creates_the_project_and_reports_folder_errors(do_gql_post,
         jerrors = body['data']['createSynProject']['errors']
         assert jerrors
 
-        for folder in folders:
-            assert 'Error creating project folder: {0}.'.format(folder) in jerrors
+        for folder_path in folders:
+            for folder_part in list(filter(None, folder_path.split('/'))):
+                assert 'Error creating project folder: {0}.'.format(folder_part) in jerrors
 
 
 def test_it_creates_the_project_and_reports_wiki_errors(do_gql_post,

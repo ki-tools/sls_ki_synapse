@@ -17,7 +17,7 @@
             "title": "Main Wiki",
             "markdown": "main wiki markdown"
         },
-        "folders": ["Data", "Research Questions", "Results", "Sprint kickoff", "Report out", "Timeline"],
+        "folders": ["Data/Documentation", "Research Questions", "Results", "Sprint kickoff", "Report out", "Timeline"],
         "posts": [{
             "title": "test",
             "messageMarkdown": "Use this post for a daily check in."

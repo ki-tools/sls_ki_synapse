@@ -43,7 +43,7 @@ class UpdateSynProject(graphene.Mutation):
         if name:
             project.name = name
 
-        # An empty list mean remove all permissions.
+        # An empty list means remove all permissions.
         # A null list means don't remove any permissions.
         if permissions is not None:
             for permission in permissions:
