@@ -89,12 +89,16 @@ class CreateSynProject(graphene.Mutation):
 
         # Add the the folders
         if folders:
-            for folder_name in folders:
-                try:
-                    Synapse.client().store(Folder(name=folder_name, parent=project))
-                except Exception as syn_ex:
-                    logger.exception('Error creating project folder: {0} - {1}'.format(folder_name, syn_ex))
-                    errors.append('Error creating project folder: {0}.'.format(folder_name))
+            for folder_path in folders:
+                folder_path_parts = list(filter(None, folder_path.split('/')))
+                parent = project
+
+                for folder_name in folder_path_parts:
+                    try:
+                        parent = Synapse.client().store(Folder(name=folder_name, parent=parent))
+                    except Exception as syn_ex:
+                        logger.exception('Error creating project folder: {0} - {1}'.format(folder_name, syn_ex))
+                        errors.append('Error creating project folder: {0}.'.format(folder_name))
 
         # Add the posts
         if posts:
