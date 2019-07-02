@@ -29,10 +29,9 @@ Capabilities:
 - Configure environment variables:
   - Copy each file in [templates](templates) into the project's root directory and edit each file to contain the correct values.
 - Install Python Dependencies:
-  - `pip install -r requirements-dev.txt`
-  - `pip install -r requirements.txt`
-- Run specs.
-  - `pytest`
+  - `make reqs`
+- Run tests.
+  - `make test`
 
 ## Deploying
 
@@ -45,8 +44,9 @@ Capabilities:
     - Example: - `sls create_domain --stage production` 
   - See [serverless-domain-manager](https://github.com/amplify-education/serverless-domain-manager) for more details on configuring your custom domain.
 - Deploy to AWS
-  - `sls deploy --stage <stage>`
-    - Example: - `sls deploy --stage production`
+  - Deploy to "dev": `make deploy_dev`
+  - Deploy to "staging": `make deploy_staging`
+  - Deploy to "production": `make deploy_production`
   
 ## Authentication
 
@@ -73,9 +73,9 @@ The process for allowing a client access to the service is as follows:
 - View Logs: `sls logs -f graphql --tail`
 - Test Queries:
   - Project:
-    - Create: `./scripts/json_to_gql.py tests/handlers/test_json/create_syn_project.json | sls invoke -f graphql`
-    - Update: `./scripts/json_to_gql.py tests/handlers/test_json/update_syn_project.json | sls invoke -f graphql`
-    - Query:  `./scripts/json_to_gql.py tests/handlers/test_json/get_syn_project.json | sls invoke -f graphql`
+    - Create: `./scripts/json_to_gql.py tests/handlers/test_json/create_syn_project.json | sls invoke -f graphql --stage dev`
+    - Update: `./scripts/json_to_gql.py tests/handlers/test_json/update_syn_project.json | sls invoke -f graphql --stage dev`
+    - Query:  `./scripts/json_to_gql.py tests/handlers/test_json/get_syn_project.json | sls invoke -f graphql --stage dev`
   - Slide Deck:
-    - Create:  `./scripts/json_to_gql.py tests/handlers/test_json/create_slide_deck.json | sls invoke -f graphql`
+    - Create:  `./scripts/json_to_gql.py tests/handlers/test_json/create_slide_deck.json | sls invoke -f graphql --stage dev`
   - With curl: `curl -X POST -H 'Authorization: Bearer JWT_TOKEN_HERE' --data 'QUERY_HERE' ENDPOINT_URL_HERE`
