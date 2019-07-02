@@ -40,7 +40,6 @@ class CreateSlideDeck(graphene.Mutation):
         sprint_questions = graphene.List(graphene.String, required=True)
         background = graphene.String(required=True)
         problem_statement = graphene.String(required=True)
-        motivation = graphene.String(required=True)
         deliverables = graphene.List(graphene.String, required=True)
         key_findings = graphene.List(graphene.String, required=True)
         next_steps = graphene.List(graphene.String, required=True)
@@ -136,16 +135,14 @@ class CreateSlideDeck(graphene.Mutation):
 
         CreateSlideDeck.move_to_front(presentation)
 
-        # motivation
+        # value hypothesis
 
         slide = presentation.slides.add_slide(plain_layout)
         title_shape = CreateSlideDeck.get_placeholder(slide, 'Title 2')
         body_shape = CreateSlideDeck.get_placeholder(slide, 'Text Placeholder 1')
         title_shape.text = "Value Hypothesis"
-        body_shape.text = motivation
+        body_shape.text = value
         CreateSlideDeck.add_notes(slide)
-
-        CreateSlideDeck.move_to_front(presentation)
 
         # background
 
@@ -186,15 +183,6 @@ class CreateSlideDeck(graphene.Mutation):
             p = tf.add_paragraph()
             p.text = item
             p.level = 1
-        CreateSlideDeck.add_notes(slide)
-
-        # value
-
-        slide = presentation.slides.add_slide(plain_layout)
-        title_shape = CreateSlideDeck.get_placeholder(slide, 'Title 2')
-        body_shape = CreateSlideDeck.get_placeholder(slide, 'Text Placeholder 1')
-        title_shape.text = "Value"
-        body_shape.text = value
         CreateSlideDeck.add_notes(slide)
 
         # next steps
