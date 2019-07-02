@@ -21,8 +21,8 @@ from core import ParamStore
 @pytest.fixture()
 def gql_query():
     return '''
-          mutation CreateSlideDeck($title: String!, $presenter: String!, $sprintId: String!, $participants: [String]!, $endDate: String!, $sprintQuestions: [String]!, $background: String!, $problemStatement: String!, $motivation: String!, $deliverables: [String]!, $keyFindings: [String]!, $nextSteps: [String]!, $value: String!, $templateUrl: String) {
-            createSlideDeck(title: $title, presenter: $presenter, sprintId: $sprintId, participants: $participants, endDate: $endDate, sprintQuestions: $sprintQuestions, background: $background, problemStatement: $problemStatement, motivation: $motivation, deliverables: $deliverables, keyFindings: $keyFindings, nextSteps: $nextSteps, value: $value, templateUrl: $templateUrl) {
+          mutation CreateSlideDeck($title: String!, $presenter: String!, $sprintId: String!, $participants: [String]!, $endDate: String!, $sprintQuestions: [String]!, $background: String!, $deliverables: [String]!, $keyFindings: [String]!, $nextSteps: [String]!, $value: String!, $templateUrl: String) {
+            createSlideDeck(title: $title, presenter: $presenter, sprintId: $sprintId, participants: $participants, endDate: $endDate, sprintQuestions: $sprintQuestions, background: $background, deliverables: $deliverables, keyFindings: $keyFindings, nextSteps: $nextSteps, value: $value, templateUrl: $templateUrl) {
                 slideDeck {
                     url
                 }
@@ -42,8 +42,6 @@ def mk_gql_variables(syn_test_helper):
             'endDate': '2018-01-01',
             'sprintQuestions': ['Question1', 'Question2', 'Question3'],
             'background': 'Some Background Info',
-            'problemStatement': 'Some Problems',
-            'motivation': 'Some Motivation',
             'deliverables': ['Deliverable1', 'Deliverable2', 'Deliverable3'],
             'keyFindings': ['Finding1', 'Finding2', 'Finding3'],
             'nextSteps': ['Step1', 'Step2', 'Step3'],

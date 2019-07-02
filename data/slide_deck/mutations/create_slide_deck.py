@@ -18,7 +18,6 @@ import requests
 import tempfile
 import boto3
 import datetime
-import uuid
 from core import ParamStore
 from core.log import logger
 from ..types import SlideDeck
@@ -39,7 +38,6 @@ class CreateSlideDeck(graphene.Mutation):
         end_date = graphene.String(required=True)
         sprint_questions = graphene.List(graphene.String, required=True)
         background = graphene.String(required=True)
-        problem_statement = graphene.String(required=True)
         deliverables = graphene.List(graphene.String, required=True)
         key_findings = graphene.List(graphene.String, required=True)
         next_steps = graphene.List(graphene.String, required=True)
@@ -56,8 +54,6 @@ class CreateSlideDeck(graphene.Mutation):
                end_date,
                sprint_questions,
                background,
-               problem_statement,
-               motivation,
                deliverables,
                key_findings,
                next_steps,
