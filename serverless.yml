@@ -4,7 +4,6 @@ service:
 plugins:
   - serverless-python-requirements
   - serverless-domain-manager
-
 provider:
   name: aws
   runtime: python3.6
@@ -81,14 +80,12 @@ custom:
       - pytest
 
 package:
+  individually: false
   exclude:
-    - private.*
-    - .venv/**
-    - .vscode/**
-    - node_modules/**
-    - __pycache__/**
-    - .pytest_cache/**
-    - requirements-dev.txt
-    - templates
-    - tests
-    - scripts
+    - "**/**"
+    - "!assets/**"
+    - "!core/**"
+    - "!data/**"
+    - "!handlers/**"
+    - "**/.pytest_cache/**"
+    - "**/__pycache__/**"
