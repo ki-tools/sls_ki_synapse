@@ -1,5 +1,5 @@
 import logging
-from .app_env import AppEnv
+from .env import Env
 
 """
 Setup the logger.
@@ -10,4 +10,4 @@ if logger.handlers:
     for handler in logger.handlers:
         logger.removeHandler(handler)
 
-logging.basicConfig(level=logging.getLevelName(AppEnv.LOG_LEVEL(default='INFO')))
+logging.basicConfig(level=logging.getLevelName(Env.LOG_LEVEL(default='INFO')))

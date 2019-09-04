@@ -1,7 +1,7 @@
 import pytest
 import responses
 from moto import mock_s3
-from core import AppEnv
+from core import Env
 
 
 @pytest.fixture()
@@ -42,7 +42,7 @@ def mk_gql_variables(syn_test_helper):
 @mock_s3
 def test_it_creates_a_slide_deck_from_the_internal_template(do_gql_post, gql_query, mk_gql_variables, s3_client):
     # Create a mock bucket to store the ppt file.
-    s3_client.create_bucket(Bucket=AppEnv.SLIDE_DECKS_BUCKET_NAME())
+    s3_client.create_bucket(Bucket=Env.SLIDE_DECKS_BUCKET_NAME())
 
     gql_variables = mk_gql_variables()
 
@@ -50,13 +50,13 @@ def test_it_creates_a_slide_deck_from_the_internal_template(do_gql_post, gql_que
     assert body.get('errors', None) is None
     jslide_deck = body['data']['createSlideDeck']['slideDeck']
     assert jslide_deck['url'] is not None
-    assert AppEnv.SLIDE_DECKS_BUCKET_NAME() in jslide_deck['url']
+    assert Env.SLIDE_DECKS_BUCKET_NAME() in jslide_deck['url']
 
 
 @mock_s3
 def test_it_creates_a_slide_deck_from_an_external_template(do_gql_post, gql_query, mk_gql_variables, s3_client):
     # Create a mock bucket to store the ppt file.
-    s3_client.create_bucket(Bucket=AppEnv.SLIDE_DECKS_BUCKET_NAME())
+    s3_client.create_bucket(Bucket=Env.SLIDE_DECKS_BUCKET_NAME())
 
     template_url = 'https://afakedomainname.com/file.pptx'
     gql_variables = mk_gql_variables()
@@ -72,4 +72,4 @@ def test_it_creates_a_slide_deck_from_an_external_template(do_gql_post, gql_quer
         assert body.get('errors', None) is None
         jslide_deck = body['data']['createSlideDeck']['slideDeck']
         assert jslide_deck['url'] is not None
-        assert AppEnv.SLIDE_DECKS_BUCKET_NAME() in jslide_deck['url']
+        assert Env.SLIDE_DECKS_BUCKET_NAME() in jslide_deck['url']

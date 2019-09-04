@@ -1,7 +1,7 @@
 from sls_tools.param_store import ParamStore
 
 
-class AppEnv:
+class Env:
     @classmethod
     def SERVICE_NAME(cls, default=None):
         """

@@ -4,7 +4,7 @@ import requests
 import tempfile
 import boto3
 import datetime
-from core import AppEnv
+from core import Env
 from core.log import logger
 from ..types import SlideDeck
 from pptx import Presentation
@@ -203,15 +203,15 @@ class CreateSlideDeck(graphene.Mutation):
 
             s3 = boto3.resource('s3')
 
-            s3.meta.client.upload_file(ppt_file_path, AppEnv.SLIDE_DECKS_BUCKET_NAME(), ppt_file_name)
+            s3.meta.client.upload_file(ppt_file_path, Env.SLIDE_DECKS_BUCKET_NAME(), ppt_file_name)
 
             logger.debug('Finished uploading SlideDeck to S3.')
 
             # Generate a presigned URL that expires.
             presigned_url = s3.meta.client.generate_presigned_url(
                 'get_object',
-                Params={'Bucket': AppEnv.SLIDE_DECKS_BUCKET_NAME(), 'Key': ppt_file_name},
-                ExpiresIn=AppEnv.SLIDE_DECKS_URL_EXPIRES_IN_SECONDS()
+                Params={'Bucket': Env.SLIDE_DECKS_BUCKET_NAME(), 'Key': ppt_file_name},
+                ExpiresIn=Env.SLIDE_DECKS_URL_EXPIRES_IN_SECONDS()
             )
         finally:
             if os.path.isfile(ppt_file_path):

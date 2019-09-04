@@ -1,4 +1,4 @@
-from .app_env import AppEnv
+from .env import Env
 import jwt
 
 
@@ -9,8 +9,8 @@ class Auth:
 
     @classmethod
     def authenticate(cls, token):
-        secret = AppEnv.JWT_SECRET()
-        api_keys = AppEnv.JWT_API_KEYS()
+        secret = Env.JWT_SECRET()
+        api_keys = Env.JWT_API_KEYS()
         payload = cls.decode_jwt(token, secret)
         api_key = payload['apiKey']
 
