@@ -39,8 +39,11 @@ class AppEnv:
     def JWT_API_KEYS(cls, default=None):
         """
         String of comma separated keys that are used for API access.
+
+        Returns:
+            List of strings.
         """
-        return ParamStore.get('JWT_API_KEYS', default=default).value
+        return ParamStore.get('JWT_API_KEYS', default=default).to_list(delimiter=',')
 
     @classmethod
     def SLIDE_DECKS_BUCKET_NAME(cls, default=None):

@@ -10,7 +10,7 @@ class Auth:
     @classmethod
     def authenticate(cls, token):
         secret = AppEnv.JWT_SECRET()
-        api_keys = AppEnv.JWT_API_KEYS().split(',')
+        api_keys = AppEnv.JWT_API_KEYS()
         payload = cls.decode_jwt(token, secret)
         api_key = payload['apiKey']
 
