@@ -1,18 +1,4 @@
-# Copyright 2018-present, Bill & Melinda Gates Foundation
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
-from .param_store import ParamStore
+from .env import Env
 import jwt
 
 
@@ -23,8 +9,8 @@ class Auth:
 
     @classmethod
     def authenticate(cls, token):
-        secret = ParamStore.JWT_SECRET()
-        api_keys = ParamStore.JWT_API_KEYS().split(',')
+        secret = Env.JWT_SECRET()
+        api_keys = Env.JWT_API_KEYS()
         payload = cls.decode_jwt(token, secret)
         api_key = payload['apiKey']
 
@@ -36,7 +22,6 @@ class Auth:
     @classmethod
     def decode_jwt(cls, token, secret):
         return jwt.decode(token, key=secret, algorithms=['HS256'])
-
 
     @classmethod
     def encode_jwt(cls, secret, api_key):
