@@ -49,8 +49,10 @@ class Synapse:
         """
         if not cls._synapse_client:
             # Lambda can only write to /tmp so update the CACHE_ROOT_DIR.
-            synapseclient.cache.CACHE_ROOT_DIR = os.path.join(
-                tempfile.gettempdir(), 'synapseCache')
+            synapseclient.cache.CACHE_ROOT_DIR = os.path.join(tempfile.gettempdir(), 'synapseCache')
+
+            # Multiprocessing is not supported on Lambda.
+            synapseclient.config.single_threaded = True
 
             syn_user = Env.SYNAPSE_USERNAME()
             syn_pass = Env.SYNAPSE_PASSWORD()

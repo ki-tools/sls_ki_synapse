@@ -27,6 +27,9 @@ provider:
         - s3:DeleteObject
       Resource:
         - 'arn:aws:s3:::${self:custom.slideDeckBucketName}/*'
+  iamManagedPolicies:
+    # TODO: Remove this policy when this is fixed:  https://github.com/serverless/serverless/issues/6241
+    - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 
 functions:
   graphql:
