@@ -126,6 +126,8 @@ class CreateSlideDeck(graphene.Mutation):
         body_shape.text = value
         CreateSlideDeck.add_notes(slide)
 
+        CreateSlideDeck.move_to_front(presentation)
+
         # background
 
         slide = presentation.slides.add_slide(plain_layout)
