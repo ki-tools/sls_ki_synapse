@@ -1,25 +1,10 @@
-# Copyright 2018-present, Bill & Melinda Gates Foundation
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
 import graphene
 import os
 import requests
 import tempfile
 import boto3
 import datetime
-import uuid
-from core import ParamStore
+from core import Env
 from core.log import logger
 from ..types import SlideDeck
 from pptx import Presentation
@@ -39,7 +24,6 @@ class CreateSlideDeck(graphene.Mutation):
         end_date = graphene.String(required=True)
         sprint_questions = graphene.List(graphene.String, required=True)
         background = graphene.String(required=True)
-        problem_statement = graphene.String(required=True)
         deliverables = graphene.List(graphene.String, required=True)
         key_findings = graphene.List(graphene.String, required=True)
         next_steps = graphene.List(graphene.String, required=True)
@@ -56,8 +40,6 @@ class CreateSlideDeck(graphene.Mutation):
                end_date,
                sprint_questions,
                background,
-               problem_statement,
-               motivation,
                deliverables,
                key_findings,
                next_steps,
@@ -144,8 +126,6 @@ class CreateSlideDeck(graphene.Mutation):
         body_shape.text = value
         CreateSlideDeck.add_notes(slide)
 
-        CreateSlideDeck.move_to_front(presentation)
-
         # background
 
         slide = presentation.slides.add_slide(plain_layout)
@@ -223,15 +203,15 @@ class CreateSlideDeck(graphene.Mutation):
 
             s3 = boto3.resource('s3')
 
-            s3.meta.client.upload_file(ppt_file_path, ParamStore.SLIDE_DECKS_BUCKET_NAME(), ppt_file_name)
+            s3.meta.client.upload_file(ppt_file_path, Env.SLIDE_DECKS_BUCKET_NAME(), ppt_file_name)
 
             logger.debug('Finished uploading SlideDeck to S3.')
 
             # Generate a presigned URL that expires.
             presigned_url = s3.meta.client.generate_presigned_url(
                 'get_object',
-                Params={'Bucket': ParamStore.SLIDE_DECKS_BUCKET_NAME(), 'Key': ppt_file_name},
-                ExpiresIn=ParamStore.SLIDE_DECKS_URL_EXPIRES_IN_SECONDS()
+                Params={'Bucket': Env.SLIDE_DECKS_BUCKET_NAME(), 'Key': ppt_file_name},
+                ExpiresIn=Env.SLIDE_DECKS_URL_EXPIRES_IN_SECONDS()
             )
         finally:
             if os.path.isfile(ppt_file_path):
