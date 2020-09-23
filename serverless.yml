@@ -19,7 +19,7 @@ provider:
     - Effect: "Allow"
       Action:
         - "ssm:GetParameter"
-      Resource: { "Fn::Join": ["", ["arn:aws:ssm:${self:provider.region}:", { "Ref": "AWS::AccountId" }, ":parameter/${self:service}/${self:provider.stage}/*" ] ]  }
+      Resource: { "Fn::Join": [ "", [ "arn:aws:ssm:${self:provider.region}:", { "Ref": "AWS::AccountId" }, ":parameter/${self:service}/${self:provider.stage}/*" ] ] }
     - Effect: Allow
       Action:
         - s3:PutObject
@@ -75,6 +75,7 @@ custom:
     certificateName: ${self:custom.slsDeploy}.DOMAIN_CERTIFICATE_NAME}
     createRoute53Record: ${self:custom.slsDeploy}.DOMAIN_CREATE_ROUTE_53_RECORD}
     endpointType: ${self:custom.slsDeploy}.DOMAIN_ENDPOINT_TYPE}
+    securityPolicy: tls_1_2
   pythonRequirements:
     dockerizePip: non-linux
     # Do not slim the dependencies. PIL/Pillow needs the .pyc files
