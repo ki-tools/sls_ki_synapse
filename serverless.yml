@@ -1,15 +1,17 @@
-service:
-  name: sls-ki-synapse
+service: sls-ki-synapse
+frameworkVersion: ^2.66.1
+variablesResolutionMode: 20210326
 
 plugins:
   - serverless-python-requirements
   - serverless-domain-manager
 provider:
+  lambdaHashingVersion: 20201221
   name: aws
-  runtime: python3.6
+  runtime: python3.8
   stage: ${opt:stage, "dev"}
-  profile: ${self:custom.slsDeploy}.AWS_PROFILE}
-  region: ${self:custom.slsDeploy}.AWS_REGION}
+  profile: ${self:custom.slsDeploy.AWS_PROFILE}
+  region: ${self:custom.slsDeploy.AWS_REGION}
   timeout: 30
   environment:
     SERVICE_NAME: ${self:service}
@@ -63,33 +65,32 @@ resources:
           Rules:
             - Id: "Delete SlideDeck Bucket Files"
               Status: "Enabled"
-              ExpirationInDays: ${self:custom.slsDeploy}.SLIDE_DECKS_BUCKET_EXPIRATION_IN_DAYS}
+              ExpirationInDays: ${self:custom.slsDeploy.SLIDE_DECKS_BUCKET_EXPIRATION_IN_DAYS}
 
 custom:
-  slsDeploy: ${file(./private.sls.deploy.json):${self:provider.stage}
+  slsDeploy: ${file(./private.sls.deploy.json):${self:provider.stage}}
   slideDeckBucketName: "${self:service}-slide-decks-${self:provider.stage}"
   customDomain:
-    enabled: ${self:custom.slsDeploy}.DOMAIN_ENABLED}
-    domainName: ${self:custom.slsDeploy}.DOMAIN_NAME}
-    basePath: ${self:custom.slsDeploy}.DOMAIN_BASE_PATH}
-    certificateName: ${self:custom.slsDeploy}.DOMAIN_CERTIFICATE_NAME}
-    createRoute53Record: ${self:custom.slsDeploy}.DOMAIN_CREATE_ROUTE_53_RECORD}
-    endpointType: ${self:custom.slsDeploy}.DOMAIN_ENDPOINT_TYPE}
+    enabled: ${self:custom.slsDeploy.DOMAIN_ENABLED}
+    domainName: ${self:custom.slsDeploy.DOMAIN_NAME}
+    basePath: ${self:custom.slsDeploy.DOMAIN_BASE_PATH}
+    certificateName: ${self:custom.slsDeploy.DOMAIN_CERTIFICATE_NAME}
+    createRoute53Record: ${self:custom.slsDeploy.DOMAIN_CREATE_ROUTE_53_RECORD}
+    endpointType: ${self:custom.slsDeploy.DOMAIN_ENDPOINT_TYPE}
     securityPolicy: tls_1_2
   pythonRequirements:
+    invalidateCaches: true
+    useDownloadCache: false
+    useStaticCache: false
     dockerizePip: non-linux
-    # Do not slim the dependencies. PIL/Pillow needs the .pyc files
+    # Do not slim - pillow requires prebuilt libraries.
     slim: false
-    noDeploy:
-      - pytest
 
 package:
   individually: false
-  exclude:
-    - "**/**"
-    - "!assets/**"
-    - "!core/**"
-    - "!data/**"
-    - "!handlers/**"
-    - "**/.pytest_cache/**"
-    - "**/__pycache__/**"
+  patterns:
+    - "!**/**"
+    - "assets/**"
+    - "core/**"
+    - "data/**"
+    - "handlers/**"

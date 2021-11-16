@@ -25,4 +25,4 @@ class Auth:
 
     @classmethod
     def encode_jwt(cls, secret, api_key):
-        return jwt.encode({'apiKey': api_key}, secret, algorithm='HS256').decode()
+        return jwt.encode({'apiKey': api_key}, secret, algorithm='HS256')

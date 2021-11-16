@@ -18,7 +18,6 @@ class CreateSlideDeck(graphene.Mutation):
 
     class Arguments:
         title = graphene.String(required=True)
-        presenter = graphene.String(required=True)
         sprint_id = graphene.String(required=True)
         participants = graphene.List(graphene.String, required=True)
         end_date = graphene.String(required=True)
@@ -34,7 +33,6 @@ class CreateSlideDeck(graphene.Mutation):
     def mutate(self,
                info,
                title,
-               presenter,
                sprint_id,
                participants,
                end_date,
@@ -147,8 +145,7 @@ class CreateSlideDeck(graphene.Mutation):
         body_shape2 = CreateSlideDeck.get_placeholder(slide, 'Text Placeholder 3')
         title_shape.text = 'Rally {0}: {1}'.format(sprint_id, title)
         body_shape1.text = 'Completed {0}'.format(end_date)
-        body_shape2.text = 'Presented by {0} on behalf of rally participants {1}'.format(
-            presenter, ', '.join(participants))
+        body_shape2.text = 'Rally participants {0}'.format(', '.join(participants))
         CreateSlideDeck.add_notes(slide)
 
         CreateSlideDeck.move_to_front(presentation)

@@ -22,7 +22,7 @@ def load_json(path):
 
 def load_yaml(path):
     with open(path) as f:
-        return yaml.load(f)
+        return yaml.load(f, Loader=yaml.FullLoader)
 
 
 def import_into_ssm(service_name, stage):

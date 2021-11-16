@@ -48,3 +48,8 @@ deploy_production:
 .PHONY: remove_production
 remove_production:
 	sls remove --stage production
+
+
+.PHONY: man_test_create_slide_deck
+man_test_create_slide_deck:
+	./scripts/json_to_gql.py tests/handlers/test_json/create_slide_deck.json | sls invoke -f graphql --stage dev
