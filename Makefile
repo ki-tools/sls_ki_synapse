@@ -50,6 +50,24 @@ remove_production:
 	sls remove --stage production
 
 
+.PHONY: man_test_all
+man_test_all:
+	JSON=$$(./scripts/json_to_gql.py tests/handlers/test_json/create_syn_project.json name="Manual Test Project `date +%s`" | sls invoke -f graphql --stage dev); \
+	echo "$$JSON"; \
+	ID=$$(echo $$JSON | python -c "import json,sys;obj=json.loads(' '.join(sys.stdin.read().split(')', maxsplit=1)[1:]));print(json.loads(obj['body'])['data']['createSynProject']['synProject']['id']);"); \
+	./scripts/json_to_gql.py tests/handlers/test_json/update_syn_project.json id=$$ID name="Manual Test Project UPDATED `date +%s`" | sls invoke -f graphql --stage dev; \
+	./scripts/json_to_gql.py tests/handlers/test_json/get_syn_project.json id=$$ID | sls invoke -f graphql --stage dev; \
+	./scripts/json_to_gql.py tests/handlers/test_json/create_slide_deck.json | sls invoke -f graphql --stage dev;
+
+
+.PHONY: man_test_create_syn_project
+man_test_create_syn_project:
+	./scripts/json_to_gql.py tests/handlers/test_json/create_syn_project.json name="Manual Test Project `date +%s`" | sls invoke -f graphql --stage dev
+
+
 .PHONY: man_test_create_slide_deck
 man_test_create_slide_deck:
 	./scripts/json_to_gql.py tests/handlers/test_json/create_slide_deck.json | sls invoke -f graphql --stage dev
+
+
+
