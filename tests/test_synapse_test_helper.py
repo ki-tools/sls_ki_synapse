@@ -67,7 +67,7 @@ def test_dispose(syn_client, syn_test_helper, temp_file):
     assert len(syn_test_helper._trash) == 0
 
     for syn_obj in syn_objects:
-        with pytest.raises(synapseclient.exceptions.SynapseHTTPError) as ex:
+        with pytest.raises(synapseclient.core.exceptions.SynapseHTTPError) as ex:
             if isinstance(syn_obj, Wiki):
                 syn_client.getWiki(syn_obj)
             elif isinstance(syn_obj, Team):

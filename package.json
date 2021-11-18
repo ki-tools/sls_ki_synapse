@@ -2,9 +2,8 @@
   "name": "sls-ki-synapse",
   "description": "",
   "version": "0.1.0",
-  "dependencies": {},
   "devDependencies": {
-    "serverless-domain-manager": "^4.2.3",
-    "serverless-python-requirements": "^5.0.0"
+    "serverless-domain-manager": "^5.2.0",
+    "serverless-python-requirements": "^5.1.1"
   }
 }

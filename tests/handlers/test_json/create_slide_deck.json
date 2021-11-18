@@ -1,17 +1,36 @@
 {
-    "query": "mutation CreateSlideDeck($title: String!, $presenter: String!, $sprintId: String!, $participants: [String]!, $endDate: String!, $sprintQuestions: [String]!, $background: String!, $deliverables: [String]!, $keyFindings: [String]!, $nextSteps: [String]!, $value: String!, $templateUrl: String) { createSlideDeck(title: $title, presenter: $presenter, sprintId: $sprintId, participants: $participants, endDate: $endDate, sprintQuestions: $sprintQuestions, background: $background, deliverables: $deliverables, keyFindings: $keyFindings, nextSteps: $nextSteps, value: $value, templateUrl: $templateUrl) { slideDeck { url } } }",
-    "variables": {
-        "title": "My Title",
-        "presenter": "Name1",
-        "sprintId": "A",
-        "participants": ["Name1", "Name2", "Name3"],
-        "endDate": "2018-01-01",
-        "sprintQuestions": ["Question1", "Question2", "Question3"],
-        "background": "Some Background Info",
-        "deliverables": ["Deliverable1", "Deliverable2", "Deliverable3"],
-        "keyFindings": ["Finding1", "Finding2", "Finding3"],
-        "nextSteps": ["Step1", "Step2", "Step3"],
-        "value": "Some Value",
-        "templateUrl": null
-    }
+  "query": "mutation CreateSlideDeck($title: String!, $sprintId: String!, $participants: [String]!, $endDate: String!, $sprintQuestions: [String]!, $background: String!, $deliverables: [String]!, $keyFindings: [String]!, $nextSteps: [String]!, $value: String!, $templateUrl: String) { createSlideDeck(title: $title, sprintId: $sprintId, participants: $participants, endDate: $endDate, sprintQuestions: $sprintQuestions, background: $background, deliverables: $deliverables, keyFindings: $keyFindings, nextSteps: $nextSteps, value: $value, templateUrl: $templateUrl) { slideDeck { url } } }",
+  "variables": {
+    "title": "My Title",
+    "sprintId": "A",
+    "participants": [
+      "Name1",
+      "Name2",
+      "Name3"
+    ],
+    "endDate": "2018-01-01",
+    "sprintQuestions": [
+      "Question1",
+      "Question2",
+      "Question3"
+    ],
+    "background": "Some Background Info",
+    "deliverables": [
+      "Deliverable1",
+      "Deliverable2",
+      "Deliverable3"
+    ],
+    "keyFindings": [
+      "Finding1",
+      "Finding2",
+      "Finding3"
+    ],
+    "nextSteps": [
+      "Step1",
+      "Step2",
+      "Step3"
+    ],
+    "value": "Some Value",
+    "templateUrl": null
+  }
 }

@@ -28,6 +28,7 @@ class UpdateSynProject(graphene.Mutation):
 
         if name:
             project.name = name
+            project = Synapse.client().store(project)
 
         # An empty list means remove all permissions.
         # A null list means don't remove any permissions.
@@ -79,7 +80,8 @@ class UpdateSynProject(graphene.Mutation):
                 logger.exception('Error removing project permissions: {0}'.format(ex))
                 errors.append('Error removing project permissions.')
 
-        project = Synapse.client().store(project)
+        # Get the latest version of the project.
+        project = Synapse.client().get(id)
         updated_syn_project = SynProject.from_project(project)
 
         return UpdateSynProject(syn_project=updated_syn_project, errors=(errors if errors else None))

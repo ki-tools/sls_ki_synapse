@@ -3,22 +3,12 @@ import tempfile
 import os
 import json
 import boto3
+from core import Config
 
 # Load Environment variables.
-module_dir = os.path.dirname(os.path.abspath(__file__))
+Config.load_local_into_env('private.test.env.json', stage=Config.Stages.TEST)
 
-test_env_file = os.path.join(module_dir, '../private.test.env.json')
-
-if os.path.isfile(test_env_file):
-    with open(test_env_file) as f:
-        config = json.load(f).get('test')
-
-        for key, value in config.items():
-            os.environ[key] = value
-else:
-    print('WARNING: Test environment file not found at: {0}'.format(test_env_file))
-
-# Import the remaining modules after the ENV variables have been loaded and set.
+# Import the remaining modules after the test ENV variables have been loaded and set.
 from tests.synapse_test_helper import SynapseTestHelper
 from handlers import graphql_handler
 from core import Synapse

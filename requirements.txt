@@ -1,8 +1,9 @@
-sls-tools==0.0.1
-synapseclient==1.9.3
-jsonschema==3.0.2
-boto3==1.9.221
-graphene==2.1.8
-graphql-server-core==1.1.1
-PyJWT==1.7.1
-python-pptx==0.6.18
+PyYAML
+sls-tools==0.0.3
+synapseclient==2.5.0
+jsonschema==4.2.1
+boto3==1.20.6
+graphene==2.1.9
+graphql-server-core==2.0.0
+PyJWT==2.3.0
+python-pptx==0.6.21

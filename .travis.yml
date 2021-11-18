@@ -1,6 +1,6 @@
 language: python
 python:
-  - "3.6"
+  - "3.8"
 before_install:
   - export LOG_LEVEL=DEBUG
   - export BOTO_CONFIG=/dev/null
@@ -11,4 +11,3 @@ script:
   - pytest --cov -v
 after_success:
   - coveralls
-  
