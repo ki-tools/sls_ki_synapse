@@ -1,47 +1,47 @@
 {
-    "description": "This file contains variables used during the serverless deploy process.",
-    "production": {
-        "AWS_PROFILE": "dev",
-        "AWS_REGION": "us-west-2",
-        "DOMAIN_ENABLED": false,
-        "DOMAIN_NAME": "api.mydomain.com",
-        "DOMAIN_BASE_PATH": "",
-        "DOMAIN_CERTIFICATE_NAME": "*.mydomain.com",
-        "DOMAIN_CREATE_ROUTE_53_RECORD": true,
-        "DOMAIN_ENDPOINT_TYPE": "regional",
-        "SLIDE_DECKS_BUCKET_EXPIRATION_IN_DAYS": 1
-    },
-    "staging": {
-        "AWS_PROFILE": "dev",
-        "AWS_REGION": "us-west-2",
-        "DOMAIN_ENABLED": false,
-        "DOMAIN_NAME": "api-staging.mydomain.com",
-        "DOMAIN_BASE_PATH": "",
-        "DOMAIN_CERTIFICATE_NAME": "*.mydomain.com",
-        "DOMAIN_CREATE_ROUTE_53_RECORD": true,
-        "DOMAIN_ENDPOINT_TYPE": "regional",
-        "SLIDE_DECKS_BUCKET_EXPIRATION_IN_DAYS": 1
-    },
-    "dev": {
-        "AWS_PROFILE": "dev",
-        "AWS_REGION": "us-west-2",
-        "DOMAIN_ENABLED": false,
-        "DOMAIN_NAME": "api-dev.mydomain.com",
-        "DOMAIN_BASE_PATH": "",
-        "DOMAIN_CERTIFICATE_NAME": "*.mydomain.com",
-        "DOMAIN_CREATE_ROUTE_53_RECORD": true,
-        "DOMAIN_ENDPOINT_TYPE": "regional",
-        "SLIDE_DECKS_BUCKET_EXPIRATION_IN_DAYS": 1
-    },
-    "test": {
-        "AWS_PROFILE": "dev",
-        "AWS_REGION": "us-west-2",
-        "DOMAIN_ENABLED": false,
-        "DOMAIN_NAME": "api-test.mydomain.com",
-        "DOMAIN_BASE_PATH": "",
-        "DOMAIN_CERTIFICATE_NAME": "*.mydomain.com",
-        "DOMAIN_CREATE_ROUTE_53_RECORD": true,
-        "DOMAIN_ENDPOINT_TYPE": "regional",
-        "SLIDE_DECKS_BUCKET_EXPIRATION_IN_DAYS": 1
-    }
+  "description": "This file contains variables used during the serverless deploy process.",
+  "production": {
+    "AWS_PROFILE": "dev",
+    "AWS_REGION": "us-west-2",
+    "DOMAIN_ENABLED": false,
+    "DOMAIN_NAME": "api.mydomain.com",
+    "DOMAIN_BASE_PATH": "",
+    "DOMAIN_CERTIFICATE_NAME": "*.mydomain.com",
+    "DOMAIN_CREATE_ROUTE_53_RECORD": true,
+    "DOMAIN_ENDPOINT_TYPE": "regional",
+    "SLIDE_DECKS_BUCKET_EXPIRATION_IN_DAYS": 1
+  },
+  "staging": {
+    "AWS_PROFILE": "dev",
+    "AWS_REGION": "us-west-2",
+    "DOMAIN_ENABLED": false,
+    "DOMAIN_NAME": "api-staging.mydomain.com",
+    "DOMAIN_BASE_PATH": "",
+    "DOMAIN_CERTIFICATE_NAME": "*.mydomain.com",
+    "DOMAIN_CREATE_ROUTE_53_RECORD": true,
+    "DOMAIN_ENDPOINT_TYPE": "regional",
+    "SLIDE_DECKS_BUCKET_EXPIRATION_IN_DAYS": 1
+  },
+  "development": {
+    "AWS_PROFILE": "dev",
+    "AWS_REGION": "us-west-2",
+    "DOMAIN_ENABLED": false,
+    "DOMAIN_NAME": "api-dev.mydomain.com",
+    "DOMAIN_BASE_PATH": "",
+    "DOMAIN_CERTIFICATE_NAME": "*.mydomain.com",
+    "DOMAIN_CREATE_ROUTE_53_RECORD": true,
+    "DOMAIN_ENDPOINT_TYPE": "regional",
+    "SLIDE_DECKS_BUCKET_EXPIRATION_IN_DAYS": 1
+  },
+  "test": {
+    "AWS_PROFILE": "dev",
+    "AWS_REGION": "us-west-2",
+    "DOMAIN_ENABLED": false,
+    "DOMAIN_NAME": "api-test.mydomain.com",
+    "DOMAIN_BASE_PATH": "",
+    "DOMAIN_CERTIFICATE_NAME": "*.mydomain.com",
+    "DOMAIN_CREATE_ROUTE_53_RECORD": true,
+    "DOMAIN_ENDPOINT_TYPE": "regional",
+    "SLIDE_DECKS_BUCKET_EXPIRATION_IN_DAYS": 1
+  }
 }

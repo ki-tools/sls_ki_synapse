@@ -41,8 +41,8 @@ Capabilities:
 ## Deploying
 
 - Populate SSM with the environment variables. This only needs to be done once or when the files/values change.
-    - `./scripts/set_ssm.py --stage <service-stage>`
-        - Example: `./scripts/set_ssm.py --stage production`
+    - `./scripts/set_ssm.py --stage <service-stage> --action <import | delete>`
+        - Example: `./scripts/set_ssm.py --stage production --action import`
     - See the [Authentication](#authentication) section for generating secrets and API keys.
 - Create the `A` records in Route53 if using a custom domain. This only needs to be done once for each stage.
     - `sls create_domain --stage <stage>`
@@ -50,7 +50,7 @@ Capabilities:
     - See [serverless-domain-manager](https://github.com/amplify-education/serverless-domain-manager) for more details
       on configuring your custom domain.
 - Deploy to AWS
-    - Deploy to "dev": `make deploy_dev`
+    - Deploy to "development": `make deploy_dev`
     - Deploy to "staging": `make deploy_staging`
     - Deploy to "production": `make deploy_production`
 
@@ -74,9 +74,9 @@ The process for allowing a client access to the service is as follows:
 
 1. Generate a secret key and an API key by running [gen_key.py](scripts/gen_key.py).
     - Add the keys to your `private.ssm.env.json` file.
-    - Update SSM: `./scripts/set_ssm.py --stage <service-stage>`
-2. Generate a JWT for the client by running [gen_jwt.py](scripts/gen_jwt.py). Use the secret and API key generated
-   above.
+    - Update SSM: `./scripts/set_ssm.py --stage <service-stage> --action import`
+2. Generate a JWT for the client by running [gen_jwt.py](scripts/gen_jwt.py). Use the secret and API key generated, or a
+   stage to load from the configuration file.
 
 ## Manual Testing
 
@@ -84,12 +84,19 @@ The process for allowing a client access to the service is as follows:
 - Test Queries:
     - Project:
       -
-      Create: `./scripts/json_to_gql.py tests/handlers/test_json/create_syn_project.json | sls invoke -f graphql --stage dev`
+      Create: `./scripts/json_to_gql.py tests/handlers/test_json/create_syn_project.json | sls invoke -f graphql --stage development`
       -
-      Update: `./scripts/json_to_gql.py tests/handlers/test_json/update_syn_project.json | sls invoke -f graphql --stage dev`
+      Update: `./scripts/json_to_gql.py tests/handlers/test_json/update_syn_project.json | sls invoke -f graphql --stage development`
       -
-      Query:  `./scripts/json_to_gql.py tests/handlers/test_json/get_syn_project.json | sls invoke -f graphql --stage dev`
+      Query:  `./scripts/json_to_gql.py tests/handlers/test_json/get_syn_project.json | sls invoke -f graphql --stage development`
+      -
     - Slide Deck:
       -
-      Create:  `./scripts/json_to_gql.py tests/handlers/test_json/create_slide_deck.json | sls invoke -f graphql --stage dev`
-    - With curl: `curl -X POST -H 'Authorization: Bearer JWT_TOKEN_HERE' --data 'QUERY_HERE' ENDPOINT_URL_HERE`
+      Create:  `./scripts/json_to_gql.py tests/handlers/test_json/create_slide_deck.json | sls invoke -f graphql --stage development`
+      -
+- Test all four queries with: `make man_test_all`
+
+
+- With curl: `curl -X POST -H 'Authorization: Bearer JWT_TOKEN_HERE' --data 'QUERY_HERE' ENDPOINT_URL_HERE/graphql`
+  -
+  Example: `curl -X POST -H 'Authorization: Bearer abcDEF.GhIJv4' --data '{"query": "query GetSynProject($id: String!) { synProject(id: $id) { id name } }","variables": {"id": "syn123456789"}}' https://api.my-domain.com/graphql`

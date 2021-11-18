@@ -9,7 +9,7 @@ provider:
   lambdaHashingVersion: 20201221
   name: aws
   runtime: python3.8
-  stage: ${opt:stage, "dev"}
+  stage: ${opt:stage, "development"}
   profile: ${self:custom.slsDeploy.AWS_PROFILE}
   region: ${self:custom.slsDeploy.AWS_REGION}
   timeout: 30
