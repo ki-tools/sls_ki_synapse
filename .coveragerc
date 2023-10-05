@@ -1,6 +1,6 @@
 [run]
 branch = True
 source =
-     core
-     data
-     handlers
+     src/core
+     src/data
+     src/handlers

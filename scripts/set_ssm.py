@@ -10,7 +10,7 @@ logging.disable()
 script_dir = os.path.dirname(__file__)
 sys.path.append(os.path.join(script_dir, '..'))
 try:
-    from core.config import Config
+    from src.core.config import Config
     from sls_tools.param_store import ParamStore
 except Exception as ex:
     print('ERROR: Failed to load imports: {0}'.format(ex))

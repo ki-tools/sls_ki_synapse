@@ -1,6 +1,6 @@
 import graphene
-from core import Synapse
-from core.log import logger
+from src.core import Synapse
+from src.core.log import logger
 from ..types import SynProject
 from .permission_data_input import PermissionDataInput
 

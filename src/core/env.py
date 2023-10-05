@@ -1,3 +1,5 @@
+import os.path
+
 from sls_tools.param_store import ParamStore
 
 
@@ -21,12 +23,8 @@ class Env:
         return ParamStore.get('LOG_LEVEL', default=default).value
 
     @staticmethod
-    def SYNAPSE_USERNAME(default=None):
-        return ParamStore.get('SYNAPSE_USERNAME', default=default).value
-
-    @staticmethod
-    def SYNAPSE_PASSWORD(default=None):
-        return ParamStore.get('SYNAPSE_PASSWORD', default=default).value
+    def SYNAPSE_AUTH_TOKEN(default=None):
+        return ParamStore.get('SYNAPSE_AUTH_TOKEN', default=default).value
 
     @staticmethod
     def JWT_SECRET(default=None):
@@ -52,3 +50,7 @@ class Env:
     @staticmethod
     def SLIDE_DECKS_URL_EXPIRES_IN_SECONDS(default=300):
         return ParamStore.get('SLIDE_DECKS_URL_EXPIRES_IN_SECONDS', default=default).to_int()
+
+    @staticmethod
+    def TEMPLATE_PPTX_PATH():
+        return os.path.abspath(os.path.join(os.path.dirname(__file__), '../assets/template_ki_empty.pptx'))

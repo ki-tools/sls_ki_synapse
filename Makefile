@@ -1,13 +1,7 @@
 .PHONY: reqs
 reqs:
-	pip install -r requirements.txt
-	pip install -r requirements-dev.txt
-
-
-.PHONY: upgrade_reqs
-upgrade_reqs:
-	pip-upgrade requirements.txt
-	pip-upgrade requirements-dev.txt
+	python -m pip install --upgrade pip
+	pipenv install --dev
 
 
 .PHONY: package

@@ -1,6 +1,5 @@
-import pytest
-from handlers import auth_handler
-from core import Auth
+from src.handlers import auth_handler
+from src.core import Auth
 
 
 def test_authenticate(monkeypatch):

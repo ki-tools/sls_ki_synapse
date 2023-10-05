@@ -1,14 +1,12 @@
 service: sls-ki-synapse
-frameworkVersion: ^2.66.1
-variablesResolutionMode: 20210326
 
 plugins:
-  - serverless-python-requirements
   - serverless-domain-manager
+  - serverless-python-requirements
+
 provider:
-  lambdaHashingVersion: 20201221
   name: aws
-  runtime: python3.8
+  runtime: python3.10
   stage: ${opt:stage, "development"}
   profile: ${self:custom.slsDeploy.AWS_PROFILE}
   region: ${self:custom.slsDeploy.AWS_REGION}
@@ -35,7 +33,7 @@ provider:
 
 functions:
   graphql:
-    handler: handlers/graphql_handler.graphql
+    handler: src/handlers/graphql_handler.graphql
     events:
       - http:
           path: /graphql
@@ -43,7 +41,7 @@ functions:
           authorizer: auth
           cors: true
   auth:
-    handler: handlers/auth_handler.authenticate
+    handler: src/handlers/auth_handler.authenticate
 
 resources:
   Resources:
@@ -79,18 +77,19 @@ custom:
     endpointType: ${self:custom.slsDeploy.DOMAIN_ENDPOINT_TYPE}
     securityPolicy: tls_1_2
   pythonRequirements:
+    dockerizePip: true
+    usePipenv: true
     invalidateCaches: true
     useDownloadCache: false
     useStaticCache: false
-    dockerizePip: non-linux
     # Do not slim - pillow requires prebuilt libraries.
     slim: false
+    strip: false
+    noDeploy:
+      - pytest
 
 package:
   individually: false
   patterns:
     - "!**/**"
-    - "assets/**"
-    - "core/**"
-    - "data/**"
-    - "handlers/**"
+    - "src/**"

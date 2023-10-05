@@ -1,6 +1,6 @@
 import graphene
 from ..types import SynProject
-from core import Synapse
+from src.core import Synapse
 
 
 class SynProjectQuery(graphene.ObjectType):

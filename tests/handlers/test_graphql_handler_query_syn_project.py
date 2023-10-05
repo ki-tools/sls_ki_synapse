@@ -1,5 +1,5 @@
 import pytest
-from data.syn_project import SynProject, SynProjectQuery
+from src.data.syn_project import SynProject, SynProjectQuery
 
 
 @pytest.fixture()
@@ -41,8 +41,8 @@ def test_handler_get_syn_project(do_gql_post, gql_query, mk_gql_variables, mocke
     assert body['data']['synProject']['name'] == expected_name
 
 
-def test_returns_a_syn_project(do_gql_post, gql_query, mk_gql_variables, syn_test_helper):
-    project = syn_test_helper.create_project()
+def test_returns_a_syn_project(do_gql_post, gql_query, mk_gql_variables, synapse_test_helper):
+    project = synapse_test_helper.create_project()
     gql_variables = mk_gql_variables(project.id)
 
     body = do_gql_post(gql_query, gql_variables).get('body')

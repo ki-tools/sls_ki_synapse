@@ -54,9 +54,8 @@ class Synapse:
             # Multiprocessing is not supported on Lambda.
             synapseclient.core.config.single_threaded = True
 
-            syn_user = Env.SYNAPSE_USERNAME()
-            syn_pass = Env.SYNAPSE_PASSWORD()
-            cls._synapse_client = synapseclient.Synapse()
-            cls._synapse_client.login(syn_user, syn_pass, silent=True)
+            auth_token = Env.SYNAPSE_AUTH_TOKEN()
+            cls._synapse_client = synapseclient.Synapse(skip_checks=True, silent=True)
+            cls._synapse_client.login(authToken=auth_token, silent=True, forced=True)
 
         return cls._synapse_client

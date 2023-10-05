@@ -1,6 +1,6 @@
 import json
-from core.log import logger
-from data import schema
+from ..core.log import logger
+from ..data import schema
 from graphql_server import (
     run_http_query,
     encode_execution_results,

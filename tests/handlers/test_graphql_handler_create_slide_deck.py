@@ -1,7 +1,7 @@
 import pytest
 import responses
 from moto import mock_s3
-from core import Env
+from src.core import Env
 
 
 @pytest.fixture()
@@ -18,7 +18,7 @@ def gql_query():
 
 
 @pytest.fixture()
-def mk_gql_variables(syn_test_helper):
+def mk_gql_variables(synapse_test_helper):
     def _mk():
         vars = {
             'title': 'My Title',
@@ -63,7 +63,7 @@ def test_it_creates_a_slide_deck_from_an_external_template(do_gql_post, gql_quer
     gql_variables = mk_gql_variables()
     gql_variables['templateUrl'] = template_url
 
-    with open('assets/template_ki_empty.pptx', 'rb') as f:
+    with open(Env.TEMPLATE_PPTX_PATH(), 'rb') as f:
         pptx = f.read()
 
     with responses.RequestsMock() as rsps:

@@ -4,8 +4,8 @@ import requests
 import tempfile
 import boto3
 import datetime
-from core import Env
-from core.log import logger
+from src.core import Env
+from src.core.log import logger
 from ..types import SlideDeck
 from pptx import Presentation
 
@@ -67,7 +67,7 @@ class CreateSlideDeck(graphene.Mutation):
                 raise Exception(
                     'Could not load template_url: {0}'.format(template_url))
         else:
-            presentation = Presentation('assets/template_ki_empty.pptx')
+            presentation = Presentation(Env.TEMPLATE_PPTX_PATH())
 
         SLD_TITLE = 'Title Slide - Text Only'
         SLD_HEAD_COPY = 'Full Width Head'

@@ -1,6 +1,6 @@
 import pytest
 import os
-from core import Synapse
+from src.core import Synapse
 
 
 @pytest.fixture()
@@ -19,9 +19,9 @@ def gql_query():
 
 
 @pytest.fixture()
-def mk_gql_variables(syn_test_helper):
+def mk_gql_variables(synapse_test_helper):
     def _mk(syn_project, name=None, with_permissions=False):
-        name = name or syn_test_helper.uniq_name(prefix='Syn Project ')
+        name = name or synapse_test_helper.uniq_name(prefix='Syn Project ')
 
         vars = {
             "id": syn_project.id,
@@ -30,7 +30,7 @@ def mk_gql_variables(syn_test_helper):
         }
 
         if with_permissions:
-            syn_team = syn_test_helper.create_team()
+            syn_team = synapse_test_helper.create_team()
             vars['permissions'] = [{"principalId": str(syn_team.id), "access": "ADMIN"}]
 
             other_test_user_id = os.environ.get('SYNAPSE_OTHER_USER_ID', None)
@@ -44,8 +44,8 @@ def mk_gql_variables(syn_test_helper):
     yield _mk
 
 
-def test_it_updates_the_project_name(do_gql_post, gql_query, mk_gql_variables, syn_test_helper, syn_client):
-    project = syn_test_helper.create_project()
+def test_it_updates_the_project_name(do_gql_post, gql_query, mk_gql_variables, synapse_test_helper, syn_client):
+    project = synapse_test_helper.create_project()
 
     gql_variables = mk_gql_variables(project)
     new_name = gql_variables.get('name')
@@ -61,8 +61,8 @@ def test_it_updates_the_project_name(do_gql_post, gql_query, mk_gql_variables, s
     assert project.name == new_name
 
 
-def test_it_adds_and_removes_permissions(do_gql_post, gql_query, mk_gql_variables, syn_test_helper, syn_client):
-    project = syn_test_helper.create_project()
+def test_it_adds_and_removes_permissions(do_gql_post, gql_query, mk_gql_variables, synapse_test_helper, syn_client):
+    project = synapse_test_helper.create_project()
 
     gql_variables = mk_gql_variables(project, with_permissions=True)
     permissions = gql_variables.get('permissions')
@@ -95,9 +95,9 @@ def test_it_adds_and_removes_permissions(do_gql_post, gql_query, mk_gql_variable
 def test_it_updates_the_project_and_reports_permission_errors(do_gql_post,
                                                               gql_query,
                                                               mk_gql_variables,
-                                                              syn_test_helper,
+                                                              synapse_test_helper,
                                                               mocker):
-    project = syn_test_helper.create_project()
+    project = synapse_test_helper.create_project()
 
     gql_variables = mk_gql_variables(project, with_permissions=True)
     permissions = gql_variables['permissions']
@@ -106,7 +106,7 @@ def test_it_updates_the_project_and_reports_permission_errors(do_gql_post,
     # User/Team does not exist error.
     with mocker.mock_module.patch.object(Synapse.client(), 'setPermissions') as mock:
         mock.side_effect = Exception('a foreign key constraint fails')
-        gql_variables['name'] = syn_test_helper.uniq_name(prefix='New Project Name ')
+        gql_variables['name'] = synapse_test_helper.uniq_name(prefix='New Project Name ')
 
         body = do_gql_post(gql_query, gql_variables).get('body')
         assert body.get('errors', None) is None
@@ -119,7 +119,7 @@ def test_it_updates_the_project_and_reports_permission_errors(do_gql_post,
     # General unknown error.
     with mocker.mock_module.patch.object(Synapse.client(), 'setPermissions') as mock:
         mock.side_effect = Exception('some random error')
-        gql_variables['name'] = syn_test_helper.uniq_name(prefix='New Project Name ')
+        gql_variables['name'] = synapse_test_helper.uniq_name(prefix='New Project Name ')
 
         body = do_gql_post(gql_query, gql_variables).get('body')
         assert body.get('errors', None) is None

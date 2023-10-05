@@ -3,7 +3,7 @@
   "description": "",
   "version": "0.1.0",
   "devDependencies": {
-    "serverless-domain-manager": "^5.2.0",
-    "serverless-python-requirements": "^5.1.1"
+    "serverless-domain-manager": "^7.1.2",
+    "serverless-python-requirements": "^6.0.0"
   }
 }

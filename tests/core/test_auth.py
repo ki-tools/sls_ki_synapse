@@ -1,5 +1,4 @@
-import pytest
-from core import Auth
+from src.core import Auth
 
 
 def test_authenticate(monkeypatch):

@@ -7,8 +7,8 @@ import os
 script_dir = os.path.dirname(__file__)
 sys.path.append(os.path.join(script_dir, '..'))
 try:
-    from core.auth import Auth
-    from core.config import Config
+    from src.core.auth import Auth
+    from src.core.config import Config
 except Exception as ex:
     print('WARNING: Failed to load imports: {0}'.format(ex))
 

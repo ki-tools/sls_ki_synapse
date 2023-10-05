@@ -1,17 +1,17 @@
 import pytest
 import os
-from core import Synapse
+from src.core import Synapse
 import synapseclient
 
 
-def dispose_syn_project_from_body(body, syn_test_helper):
+def dispose_syn_project_from_body(body, synapse_test_helper):
     if body is None:
         return
 
     project_id = body.get('data', {}).get('createSynProject', {}).get('synProject', {}).get('id', None)
     if project_id:
         syn_project = Synapse.client().get(project_id)
-        syn_test_helper.dispose_of(syn_project)
+        synapse_test_helper.dispose_of(syn_project)
         return syn_project
     else:
         return None
@@ -33,10 +33,10 @@ def gql_query():
 
 
 @pytest.fixture()
-def mk_gql_variables(syn_test_helper):
+def mk_gql_variables(synapse_test_helper):
     def _mk(with_all=False, with_permissions=False, with_annotations=False, with_wiki=False, with_folders=False,
             with_posts=False):
-        name = syn_test_helper.uniq_name(prefix='Syn Project ')
+        name = synapse_test_helper.uniq_name(prefix='Syn Project ')
         vars = {
             'name': name,
             "permissions": None,
@@ -47,7 +47,7 @@ def mk_gql_variables(syn_test_helper):
         }
 
         if with_all or with_permissions:
-            syn_team = syn_test_helper.create_team()
+            syn_team = synapse_test_helper.create_team()
             vars['permissions'] = [{"principalId": str(syn_team.id), "access": "ADMIN"}]
 
             other_test_user_id = os.environ.get('SYNAPSE_OTHER_USER_ID', None)
@@ -73,7 +73,7 @@ def mk_gql_variables(syn_test_helper):
     yield _mk
 
 
-def test_it_creates_a_synapse_project(do_gql_post, gql_query, mk_gql_variables, syn_test_helper, syn_client):
+def test_it_creates_a_synapse_project(do_gql_post, gql_query, mk_gql_variables, synapse_test_helper, syn_client):
     # Just the project
     gql_variables = mk_gql_variables()
 
@@ -84,7 +84,7 @@ def test_it_creates_a_synapse_project(do_gql_post, gql_query, mk_gql_variables, 
     jsyn_project = body['data']['createSynProject']['synProject']
     assert jsyn_project['name'] == gql_variables.get('name')
 
-    project = dispose_syn_project_from_body(body, syn_test_helper)
+    project = dispose_syn_project_from_body(body, synapse_test_helper)
     assert project.name == gql_variables.get('name')
 
     # The project and all properties
@@ -93,10 +93,10 @@ def test_it_creates_a_synapse_project(do_gql_post, gql_query, mk_gql_variables, 
     body = do_gql_post(gql_query, gql_variables).get('body')
     assert body.get('errors', None) is None
     assert body['data']['createSynProject']['errors'] is None
-    assert dispose_syn_project_from_body(body, syn_test_helper)
+    assert dispose_syn_project_from_body(body, synapse_test_helper)
 
 
-def test_it_creates_permissions(do_gql_post, gql_query, mk_gql_variables, syn_test_helper, syn_client):
+def test_it_creates_permissions(do_gql_post, gql_query, mk_gql_variables, synapse_test_helper, syn_client):
     gql_variables = mk_gql_variables(with_permissions=True)
     permissions = gql_variables.get('permissions')
     assert len(permissions) > 0
@@ -105,7 +105,7 @@ def test_it_creates_permissions(do_gql_post, gql_query, mk_gql_variables, syn_te
     assert body.get('errors', None) is None
     assert body['data']['createSynProject']['errors'] is None
 
-    project = dispose_syn_project_from_body(body, syn_test_helper)
+    project = dispose_syn_project_from_body(body, synapse_test_helper)
 
     for permission in permissions:
         principal_id = permission['principalId']
@@ -116,7 +116,7 @@ def test_it_creates_permissions(do_gql_post, gql_query, mk_gql_variables, syn_te
         assert set(perms) == set(access_type)
 
 
-def test_it_creates_annotations(do_gql_post, gql_query, mk_gql_variables, syn_test_helper, syn_client):
+def test_it_creates_annotations(do_gql_post, gql_query, mk_gql_variables, synapse_test_helper, syn_client):
     gql_variables = mk_gql_variables(with_annotations=True)
     annotations = gql_variables.get('annotations')
     assert len(annotations) > 0
@@ -125,13 +125,13 @@ def test_it_creates_annotations(do_gql_post, gql_query, mk_gql_variables, syn_te
     assert body.get('errors', None) is None
     assert body['data']['createSynProject']['errors'] is None
 
-    project = dispose_syn_project_from_body(body, syn_test_helper)
+    project = dispose_syn_project_from_body(body, synapse_test_helper)
 
     for annotation in annotations:
         assert project.annotations[annotation['key']][0] == annotation['value']
 
 
-def test_it_creates_the_wiki(do_gql_post, gql_query, mk_gql_variables, syn_test_helper, syn_client):
+def test_it_creates_the_wiki(do_gql_post, gql_query, mk_gql_variables, synapse_test_helper, syn_client):
     gql_variables = mk_gql_variables(with_wiki=True)
     wiki = gql_variables.get('wiki')
     assert wiki
@@ -140,14 +140,14 @@ def test_it_creates_the_wiki(do_gql_post, gql_query, mk_gql_variables, syn_test_
     assert body.get('errors', None) is None
     assert body['data']['createSynProject']['errors'] is None
 
-    project = dispose_syn_project_from_body(body, syn_test_helper)
+    project = dispose_syn_project_from_body(body, synapse_test_helper)
 
     main_wiki = syn_client.getWiki(project)
     assert main_wiki.title == wiki['title']
     assert main_wiki.markdown == wiki['markdown']
 
 
-def test_it_creates_folders(do_gql_post, gql_query, mk_gql_variables, syn_test_helper, syn_client):
+def test_it_creates_folders(do_gql_post, gql_query, mk_gql_variables, synapse_test_helper, syn_client):
     gql_variables = mk_gql_variables(with_folders=True)
     folders = gql_variables.get('folders')
     assert len(folders) > 0
@@ -156,7 +156,7 @@ def test_it_creates_folders(do_gql_post, gql_query, mk_gql_variables, syn_test_h
     assert body.get('errors', None) is None
     assert body['data']['createSynProject']['errors'] is None
 
-    project = dispose_syn_project_from_body(body, syn_test_helper)
+    project = dispose_syn_project_from_body(body, synapse_test_helper)
 
     for folder_path in folders:
         parent = project
@@ -168,7 +168,7 @@ def test_it_creates_folders(do_gql_post, gql_query, mk_gql_variables, syn_test_h
             parent = syn_folder
 
 
-def test_it_creates_posts(do_gql_post, gql_query, mk_gql_variables, syn_test_helper, syn_client):
+def test_it_creates_posts(do_gql_post, gql_query, mk_gql_variables, synapse_test_helper, syn_client):
     gql_variables = mk_gql_variables(with_posts=True)
     posts = gql_variables.get('posts')
     assert len(posts) > 0
@@ -177,7 +177,7 @@ def test_it_creates_posts(do_gql_post, gql_query, mk_gql_variables, syn_test_hel
     assert body.get('errors', None) is None
     assert body['data']['createSynProject']['errors'] is None
 
-    project = dispose_syn_project_from_body(body, syn_test_helper)
+    project = dispose_syn_project_from_body(body, synapse_test_helper)
 
     project_forum = syn_client.restGET('/project/{0}/forum'.format(project.id))
     threads = syn_client.restGET(
@@ -186,10 +186,11 @@ def test_it_creates_posts(do_gql_post, gql_query, mk_gql_variables, syn_test_hel
         assert thread['title'] in [p['title'] for p in posts]
 
 
-def test_it_errors_if_the_project_name_is_taken(do_gql_post, gql_query, mk_gql_variables, syn_test_helper, syn_client):
+def test_it_errors_if_the_project_name_is_taken(do_gql_post, gql_query, mk_gql_variables, synapse_test_helper,
+                                                syn_client):
     gql_variables = mk_gql_variables()
 
-    syn_project = syn_test_helper.create_project()
+    syn_project = synapse_test_helper.create_project()
     name = syn_project.name
 
     gql_variables['name'] = name
@@ -203,7 +204,7 @@ def test_it_errors_if_the_project_name_is_taken(do_gql_post, gql_query, mk_gql_v
 def test_it_creates_the_project_and_reports_permission_errors(do_gql_post,
                                                               gql_query,
                                                               mk_gql_variables,
-                                                              syn_test_helper,
+                                                              synapse_test_helper,
                                                               mocker):
     gql_variables = mk_gql_variables(with_permissions=True)
     permissions = gql_variables['permissions']
@@ -212,10 +213,10 @@ def test_it_creates_the_project_and_reports_permission_errors(do_gql_post,
     # User/Team does not exist error.
     with mocker.mock_module.patch.object(Synapse.client(), 'setPermissions') as mock:
         mock.side_effect = Exception('a foreign key constraint fails')
-        gql_variables['name'] = syn_test_helper.uniq_name(prefix='New Project Name ')
+        gql_variables['name'] = synapse_test_helper.uniq_name(prefix='New Project Name ')
 
         body = do_gql_post(gql_query, gql_variables).get('body')
-        assert dispose_syn_project_from_body(body, syn_test_helper)
+        assert dispose_syn_project_from_body(body, synapse_test_helper)
         assert body.get('errors', None) is None
         jerrors = body['data']['createSynProject']['errors']
         assert jerrors
@@ -226,10 +227,10 @@ def test_it_creates_the_project_and_reports_permission_errors(do_gql_post,
     # General unknown error.
     with mocker.mock_module.patch.object(Synapse.client(), 'setPermissions') as mock:
         mock.side_effect = Exception('some random error')
-        gql_variables['name'] = syn_test_helper.uniq_name(prefix='New Project Name ')
+        gql_variables['name'] = synapse_test_helper.uniq_name(prefix='New Project Name ')
 
         body = do_gql_post(gql_query, gql_variables).get('body')
-        assert dispose_syn_project_from_body(body, syn_test_helper)
+        assert dispose_syn_project_from_body(body, synapse_test_helper)
         assert body.get('errors', None) is None
         jerrors = body['data']['createSynProject']['errors']
         assert jerrors
@@ -240,7 +241,7 @@ def test_it_creates_the_project_and_reports_permission_errors(do_gql_post,
 def test_it_creates_the_project_and_reports_folder_errors(do_gql_post,
                                                           gql_query,
                                                           mk_gql_variables,
-                                                          syn_test_helper,
+                                                          synapse_test_helper,
                                                           mocker):
     gql_variables = mk_gql_variables(with_folders=True)
     folders = gql_variables['folders']
@@ -255,7 +256,7 @@ def test_it_creates_the_project_and_reports_folder_errors(do_gql_post,
 
     with mocker.mock_module.patch.object(Synapse.client(), 'store', new=_store_proxy):
         body = do_gql_post(gql_query, gql_variables).get('body')
-        assert dispose_syn_project_from_body(body, syn_test_helper)
+        assert dispose_syn_project_from_body(body, synapse_test_helper)
         assert body.get('errors', None) is None
         jerrors = body['data']['createSynProject']['errors']
         assert jerrors
@@ -268,7 +269,7 @@ def test_it_creates_the_project_and_reports_folder_errors(do_gql_post,
 def test_it_creates_the_project_and_reports_wiki_errors(do_gql_post,
                                                         gql_query,
                                                         mk_gql_variables,
-                                                        syn_test_helper,
+                                                        synapse_test_helper,
                                                         mocker):
     gql_variables = mk_gql_variables(with_wiki=True)
     wiki = gql_variables['wiki']
@@ -283,7 +284,7 @@ def test_it_creates_the_project_and_reports_wiki_errors(do_gql_post,
 
     with mocker.mock_module.patch.object(Synapse.client(), 'store', new=_store_proxy):
         body = do_gql_post(gql_query, gql_variables).get('body')
-        assert dispose_syn_project_from_body(body, syn_test_helper)
+        assert dispose_syn_project_from_body(body, synapse_test_helper)
         assert body.get('errors', None) is None
         jerrors = body['data']['createSynProject']['errors']
         assert jerrors
@@ -293,7 +294,7 @@ def test_it_creates_the_project_and_reports_wiki_errors(do_gql_post,
 def test_it_creates_the_project_and_reports_posts_errors(do_gql_post,
                                                          gql_query,
                                                          mk_gql_variables,
-                                                         syn_test_helper,
+                                                         synapse_test_helper,
                                                          mocker):
     gql_variables = mk_gql_variables(with_posts=True)
     posts = gql_variables['posts']
@@ -307,9 +308,9 @@ def test_it_creates_the_project_and_reports_posts_errors(do_gql_post,
         return _real_restGET(uri, endpoint=endpoint, headers=headers, retryPolicy=retryPolicy, **kwargs)
 
     with mocker.mock_module.patch.object(Synapse.client(), 'restGET', new=_restGET_proxy):
-        gql_variables['name'] = syn_test_helper.uniq_name(prefix='New Project Name ')
+        gql_variables['name'] = synapse_test_helper.uniq_name(prefix='New Project Name ')
         body = do_gql_post(gql_query, gql_variables).get('body')
-        assert dispose_syn_project_from_body(body, syn_test_helper)
+        assert dispose_syn_project_from_body(body, synapse_test_helper)
         assert body.get('errors', None) is None
         jerrors = body['data']['createSynProject']['errors']
         assert jerrors
@@ -324,9 +325,9 @@ def test_it_creates_the_project_and_reports_posts_errors(do_gql_post,
                               **kwargs)
 
     with mocker.mock_module.patch.object(Synapse.client(), 'restPOST', new=_restPOST_proxy):
-        gql_variables['name'] = syn_test_helper.uniq_name(prefix='New Project Name ')
+        gql_variables['name'] = synapse_test_helper.uniq_name(prefix='New Project Name ')
         body = do_gql_post(gql_query, gql_variables).get('body')
-        assert dispose_syn_project_from_body(body, syn_test_helper)
+        assert dispose_syn_project_from_body(body, synapse_test_helper)
         assert body.get('errors', None) is None
         jerrors = body['data']['createSynProject']['errors']
         assert jerrors

@@ -27,9 +27,8 @@ Capabilities:
 - Install Serverless Plugins:
     - `npm install`
 - Create and activate a Virtual Environment:
-    - `python3.8 -m venv .venv`
-    - `source .venv/bin/activate`
-    - `python -m pip install --upgrade pip` (REQUIRED!)
+    - `pipenv --python3.10`
+    - `pipenv shell`
 - Configure environment variables:
     - Copy each file in [templates](templates) into the project's root directory and edit each file to contain the
       correct values.

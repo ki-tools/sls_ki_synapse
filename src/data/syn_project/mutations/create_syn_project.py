@@ -1,13 +1,13 @@
 import graphene
 import json
-from core import Synapse
-from core.log import logger
+from src.core import Synapse
+from src.core.log import logger
 from .annotation_data_input import AnnotationDataInput
 from .permission_data_input import PermissionDataInput
 from .post_data_input import PostDataInput
 from .wiki_data_input import WikiDataInput
 from ..types import SynProject
-from synapseclient import Project, Folder, Team, Wiki
+from synapseclient import Project, Folder, Wiki
 
 
 class CreateSynProject(graphene.Mutation):
@@ -73,7 +73,7 @@ class CreateSynProject(graphene.Mutation):
                     logger.exception('Error creating project permissions: {0} - {1}'.format(permission, ex))
                     errors.append('Error creating project permissions.')
 
-        # Add the the folders
+        # Add the folders
         if folders:
             for folder_path in folders:
                 folder_path_parts = list(filter(None, folder_path.split('/')))

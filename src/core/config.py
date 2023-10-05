@@ -52,7 +52,7 @@ class Config:
             Dict of environment variables.
         """
         module_dir = os.path.dirname(os.path.abspath(__file__))
-        src_root_dir = os.path.abspath(os.path.join(module_dir, '..'))
+        src_root_dir = os.path.abspath(os.path.join(module_dir, '../..'))
         config_file_path = os.path.join(src_root_dir, filename)
 
         result = {}
